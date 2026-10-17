@@ -270,6 +270,7 @@ body.is-loaded .hero__copy > :not(h1) { opacity: 1; transform: none; }
 }
 .fan__card video, .fan__card img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
 .fan__card, .slide { isolation: isolate; -webkit-mask-image: -webkit-radial-gradient(white, black); }
+.fan__dim { position: absolute; inset: 0; z-index: 2; background: #050507; opacity: 0; pointer-events: none; border-radius: inherit; }
 .fan__card::after {
   content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.22), transparent 30%, transparent 70%, rgba(42, 75, 255, 0.25));

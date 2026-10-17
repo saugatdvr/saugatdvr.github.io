@@ -6,7 +6,9 @@ A fast, single-page portfolio. No installs or build tools needed: it's plain HTM
 
 ## 1. See it on your Mac
 
-Double-click **`index.html`**. It opens in your browser.
+Double-click **`Preview website.command`**. It opens the site in your browser at http://localhost:5173 (keep its window open while you look).
+
+(Double-clicking `index.html` also works, but the 3D splat portrait needs the preview above.)
 
 > Tip: add `?skip` to the end of the address (e.g. `index.html?skip`) to skip the intro animation while you're checking things.
 
@@ -72,7 +74,9 @@ The `upload to github` folder is already set up as a Git repository linked to it
 
 ---
 
-## Undo the editing effects (roll back)
+## Older versions (roll back)
 
-A copy of the site from just before the effects were added is in `backups/before-effects`.
-To go back: copy `index.html`, `content.js`, `works.js` and the `css` and `js` folders from there into the `website` folder (replace when asked), then double-click **Update my work.command**.
+- `backups/before-effects`: the site before any editing-software effects.
+- `backups/effects-v1`: the version with 3D tools, colour page, pop-out and splat portrait.
+
+To use one: copy its `index.html` and the `css` and `js` folders into the `website` folder (replace when asked), then double-click **Update my work.command**. Your text in `content.js` and your videos stay as they are.

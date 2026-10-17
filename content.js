@@ -56,6 +56,16 @@ window.SITE = {
     ],
   },
 
+  // Big statement near the end — words light up as you scroll. Put *stars* around words to make them lime + italic.
+  manifesto: "Cutting stories, chasing *retention*, turning raw footage into *reels* people actually finish. *Four years*, 500+ reels, one obsession: the *perfect cut.*",
+
+  // The two giant moving rows behind your photo, and the signature drawn over it
+  signoff: {
+    rowOne: "Edited in Nepal · Cut for the world ·",
+    rowTwo: "500+ reels · 20+ brands · 4 years ·",
+    signature: "Saugat",
+  },
+
   about: {
     title: ["About", "me"],
     // The big paragraph that lights up word by word as you scroll

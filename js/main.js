@@ -167,25 +167,25 @@
   lb.addEventListener("click", (e) => { if (e.target === lb || e.target === lbMedia) closeWork(); });
   addEventListener("keydown", (e) => { if (e.key === "Escape" && !lb.hidden) closeWork(); });
 
-  /* ── Hero: fanned 3D cards ── */
+  /* ── Hero: cards on a slowly rotating 3D ring (clockwise) ── */
   const fan = $(".fan");
   const picked = (SITE.heroVideos || []).map(bySlug).filter(Boolean);
-  const heroWorks = (picked.length ? picked : [...WORKS.filter(isVertical), ...WORKS.filter((w) => !isVertical(w))]).slice(0, 5);
-  const POSES = [
-    { x: -1.12, y: 0.3, rz: -12, ry: 18, z: -140 },
-    { x: -0.5, y: 0.1, rz: -5, ry: 10, z: -50 },
-    { x: 0.14, y: -0.06, rz: 2, ry: 0, z: 30 },
-    { x: 0.76, y: -0.2, rz: 8, ry: -10, z: -40 },
-    { x: 1.36, y: -0.36, rz: 14, ry: -18, z: -130 },
-  ];
+  const rest = [...WORKS.filter(isVertical), ...WORKS.filter((w) => !isVertical(w))].filter((w) => !picked.includes(w));
+  const heroWorks = [...picked, ...rest].slice(0, 7);
+  let ringAngle = Math.PI / 2, ringHover = false;
   const fanCards = heroWorks.map((w, i) => {
     const c = el("figure", "fan__card");
-    if (w.type === "video") c.append(makeVideo(w.loop || w.src, w.poster, { autoplay: true }));
+    let media = null;
+    if (w.type === "video") { media = makeVideo(w.loop || w.src, w.poster); c.append(media); }
     else { const img = new Image(); img.src = w.src; img.alt = ""; c.append(img); }
+    c.append(el("span", "fan__dim"));
     c.dataset.cursor = "Play";
     c.addEventListener("click", () => openWork(w));
+    c.addEventListener("pointerenter", () => (ringHover = true));
+    c.addEventListener("pointerleave", () => (ringHover = false));
     fan.append(c);
-    return { node: c, pose: POSES[i + Math.floor((5 - heroWorks.length) / 2)] || POSES[2] };
+    // the first picked video starts at the front; the rest follow round the ring
+    return { node: c, media, offset: (i * Math.PI * 2) / heroWorks.length, playing: false, dim: c.lastChild };
   });
 
   /* ── Work coverflow ── */
@@ -232,10 +232,7 @@
     const text = $(".flow__text");
     $(".flow__client").textContent = w.client || (w.type === "video" ? (isVertical(w) ? "Short-form reel" : "Brand film") : "Design");
     $(".flow__title").textContent = w.title || "";
-    if (swap) {
-      text.classList.remove("swap"); void text.offsetWidth; text.classList.add("swap");
-      document.dispatchEvent(new CustomEvent("flowchange", { detail: slides[active].node }));
-    }
+    if (swap) { text.classList.remove("swap"); void text.offsetWidth; text.classList.add("swap"); }
   }
   let flowVisible = false;
   const go = (step) => { if (!slides.length) return; active = (active + step + slides.length) % slides.length; layoutFlow(); };
@@ -334,7 +331,11 @@
     const t = en.target;
     inView.set(t, en.isIntersecting);
     if (t === flow) { flowVisible = en.isIntersecting; layoutFlow(false); return; }
-    if (t === tl || t === curve || t === scrub || t.dataset.fx) return;
+    if (t === tl || t === curve || t === scrub || (t.dataset.fx && t !== bento)) return;
+    if (t.classList.contains("hero__stage")) { // the ring decides which hero cards play
+      if (!en.isIntersecting) fanCards.forEach((c) => { c.media?.pause(); c.playing = false; });
+      return;
+    }
     $$("video", t).forEach((v) => (en.isIntersecting ? play(v) : v.pause()));
   }), { rootMargin: "100px" });
   const fxEls = $$("[data-fx]");
@@ -435,15 +436,27 @@
         heroInner.style.transform = `scale(${1 - heroP * 0.08}) translateY(${heroP * 4}%)`;
         heroInner.style.opacity = 1 - heroP * 0.55;
       }
-      const W = fanW, H = W * 16 / 9, sp = desktop ? heroP : 0;
-      fanCards.forEach(({ node, pose }, i) => {
+      const W = fanW, sp = desktop ? heroP : 0;
+      // slow clockwise spin (a full turn in ~48s), faster while scrolling away, paused on hover
+      if (!reduced) ringAngle += (ringHover ? 0 : dt * (Math.PI * 2) / 48000) * (1 + sp * 3);
+      const Rx = W * 1.5 * (1 + sp * 0.25), Ry = W * 0.5;
+      fanCards.forEach((card, i) => {
+        const { node } = card;
+        const th = ringAngle + card.offset;
+        const cs = Math.cos(th), sn = Math.sin(th);
+        const s = (sn + 1) / 2; // 0 = back of the ring, 1 = front
         const intro = reduced ? 1 : ease(clamp((now - introStart - 250 - i * 110) / 1300));
-        const f = reduced ? 0 : Math.sin(now / 1100 + i * 1.3) * 7;
-        const x = pose.x * W * (1 + sp * 0.35) + pnx * (14 + Math.abs(pose.z) * 0.08);
-        const y = pose.y * H - sp * 48 * (i - 2) + f + (1 - intro) * vh * 0.9 + pny * 10;
-        const rz = pose.rz * (1 + sp * 0.6) + (1 - intro) * pose.rz * 2.5;
-        node.style.transform = `translate(-50%, -50%) translate3d(${x}px, ${y}px, ${pose.z}px) rotateZ(${rz}deg) rotateY(${pose.ry + pnx * 10}deg) rotateX(${-pny * 8}deg)`;
+        const x = cs * Rx + pnx * (10 + s * 16);
+        const y = sn * Ry - W * 0.18 + (1 - intro) * vh * 0.9 + pny * 10 * s;
+        const z = (s - 0.5) * 260;
+        const scale = 0.52 + s * 0.48;
+        node.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, ${z.toFixed(1)}px) scale(${scale.toFixed(3)}) rotateZ(${(cs * 9).toFixed(2)}deg) rotateY(${(-cs * 22 + pnx * 8).toFixed(2)}deg) rotateX(${(-pny * 6).toFixed(2)}deg)`;
+        node.style.zIndex = Math.round(s * 100);
         node.style.opacity = intro;
+        card.dim.style.opacity = ((1 - s) * 0.62).toFixed(2);
+        // only the cards near the front play, to keep things light
+        const wantPlay = s > 0.45 && intro > 0.5;
+        if (card.media && wantPlay !== card.playing) { card.playing = wantPlay; wantPlay ? play(card.media) : card.media.pause(); }
       });
     }
 
