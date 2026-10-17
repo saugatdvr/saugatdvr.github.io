@@ -78,7 +78,7 @@ window.SITE = {
       text: "Match clips for the club, plus coverage of the Purbanchal University Futsal Cup and Jamboree Futsal League." },
   ],
 
-  tools: ["After Effects", "DaVinci Resolve", "Premiere Pro", "Photoshop", "Canva", "Blender"],   // ✏️ remove any you don't use
+  tools: ["After Effects", "DaVinci Resolve", "Photoshop", "Canva"],
 
   // Brands you've worked with (scrolling strip)   ✏️ confirm these
   clients: ["eSewa", "YOLO", "Ultima Lifestyle", "Babal Host", "Nest Nepal", "Siddhartha Capital", "Talent Sathi", "Nest SMS", "SMS Pasal"],
