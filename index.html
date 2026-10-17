@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saugat — Video Editor & Motion Designer</title>
+  <meta name="description" content="Saugat Sharma is a video editor and motion designer from Nepal, making short-form reels, brand ads and motion graphics.">
+  <meta name="theme-color" content="#050506">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=13">
+</head>
+<body class="is-loading">
+
+  <!-- Loader -->
+  <div class="loader" aria-hidden="true">
+    <div class="loader__name"><span data-site="name"></span><i>.</i></div>
+    <div class="loader__count"><span class="loader__num">0</span>%</div>
+    <div class="loader__bar"><span></span></div>
+  </div>
+
+  <!-- Gradient frame behind everything (AXIS-style) -->
+  <div class="frame" aria-hidden="true">
+    <span class="frame__blob frame__blob--blue"></span>
+    <span class="frame__blob frame__blob--lime"></span>
+    <span class="frame__blob frame__blob--deep"></span>
+  </div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- Floating pill nav -->
+  <header class="nav">
+    <a class="nav__logo" href="#top" aria-label="Back to top"><span class="nav__mark"></span><span data-site="name"></span></a>
+    <nav class="nav__links" aria-label="Main">
+      <a href="#work">Work</a>
+      <a href="#services">Services</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <a class="nav__cta" href="#contact">Let's talk <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+    <button class="nav__burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button>
+  </header>
+  <div class="menu" aria-hidden="true">
+    <a href="#work">Work</a><a href="#services">Services</a><a href="#about">About</a><a href="#contact">Contact</a>
+  </div>
+
+  <main class="shell" id="top">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero__inner">
+        <div class="hero__fog"></div>
+        <div class="hero__copy">
+          <p class="pill-tag"><span class="dot"></span><span data-site="available"></span></p>
+          <h1 class="hero__title">
+            <span class="line"><span data-hero="lineOne"></span></span>
+            <span class="line"><em class="accent" data-hero="accent"></em> <span data-hero="lineTwo"></span></span>
+          </h1>
+          <p class="hero__text" data-hero="text"></p>
+          <div class="hero__actions">
+            <a class="btn btn--lime" href="#work">See my work <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+            <a class="btn btn--glass" href="#contact">Book a call</a>
+          </div>
+          <p class="hero__role"><span data-site="role"></span> · <span data-site="location"></span></p>
+        </div>
+        <div class="hero__stage" aria-hidden="true">
+          <div class="fan"></div>
+          <span class="orb orb--a"></span>
+          <span class="orb orb--b"></span>
+        </div>
+        <a class="hero__scroll" href="#skills" aria-label="Scroll down"><svg viewBox="0 0 24 24"><path d="M6 6l6 6 6-6M6 12l6 6 6-6"/></svg></a>
+      </div>
+    </section>
+
+    <div class="stack">
+    <!-- CLIENT STRIP -->
+    <section class="clients" aria-label="Brands I've worked with">
+      <div class="clients__track"></div>
+    </section>
+
+    <!-- KINETIC TILES (Captions-style "What's included") -->
+    <section class="skills" id="skills">
+      <h2 class="rule-title" data-reveal><span class="script" data-skills="0"></span><span data-skills="1"></span></h2>
+      <div class="curve" aria-hidden="true"><div class="curve__track"></div></div>
+      <div class="stats" data-reveal></div>
+    </section>
+
+    <!-- SERVICES BENTO (AXIS-style) -->
+    <section class="services" id="services">
+      <div class="services__head">
+        <h2 class="h2" data-reveal data-services="title"></h2>
+        <div class="services__side" data-reveal>
+          <p data-services="text"></p>
+          <a class="btn btn--lime btn--sm" href="#contact">Start a project</a>
+        </div>
+      </div>
+      <div class="bento"></div>
+    </section>
+
+    <!-- INTERACTIVE 3D TIMELINE + GRAPH EDITOR -->
+    <section class="edit" id="process">
+      <h2 class="rule-title" data-reveal><span class="script">Inside</span><span>the timeline</span></h2>
+      <p class="edit__hint" data-reveal>Scroll or hover to scrub the playhead · drag the curve handles</p>
+      <div class="edit__grid">
+        <div class="tl" data-reveal aria-label="Interactive 3D editing timeline">
+          <div class="tl__stage">
+            <div class="tl__rig">
+              <div class="tl__ruler"></div>
+              <div class="tl__tracks"></div>
+              <div class="tl__playhead"><span class="tl__blade"></span></div>
+            </div>
+          </div>
+          <div class="tl__monitor" aria-hidden="true">
+            <div class="tl__screen"><img alt=""><span class="tl__caption"></span></div>
+            <div class="tl__bar"><span class="tl__rec"></span><span class="tl__tc">00:00:00:00</span></div>
+          </div>
+        </div>
+        <div class="graph" data-reveal>
+          <div class="graph__head">
+            <span>Graph editor</span>
+            <code class="graph__val">cubic-bezier(0.7, 0, 0.2, 1)</code>
+          </div>
+          <svg class="graph__svg" viewBox="-12 -62 224 324" aria-label="Easing curve, drag the two handles">
+            <g class="graph__grid"></g>
+            <line class="graph__arm graph__arm--1" />
+            <line class="graph__arm graph__arm--2" />
+            <path class="graph__curve" />
+            <circle class="graph__end" cx="0" cy="200" r="4" />
+            <circle class="graph__end" cx="200" cy="0" r="4" />
+            <circle class="graph__handle" data-h="1" r="8" tabindex="0" />
+            <circle class="graph__handle" data-h="2" r="8" tabindex="0" />
+          </svg>
+          <div class="graph__demo"><span class="graph__key"></span><span class="graph__key graph__key--end"></span><span class="graph__ball"></span></div>
+          <div class="graph__presets">
+            <button type="button" data-p="0,0,1,1">Linear</button>
+            <button type="button" data-p="0.33,0,0.67,1">Easy ease</button>
+            <button type="button" data-p="0.7,0,0.2,1" class="is-on">Snappy</button>
+            <button type="button" data-p="0.3,1.6,0.5,1">Overshoot</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WORK COVERFLOW (Captions-style "Features") -->
+    <section class="work" id="work">
+      <h2 class="big-title" data-reveal><em class="script">Selected</em> work</h2>
+      <p class="work__hint" data-reveal>Drag, swipe or use the arrows. Click a video to watch with sound.</p>
+      <div class="flow">
+        <div class="flow__stage"></div>
+        <button class="flow__arrow flow__arrow--prev" aria-label="Previous project"><svg viewBox="0 0 16 16"><path d="M10 3L5 8l5 5"/></svg></button>
+        <button class="flow__arrow flow__arrow--next" aria-label="Next project"><svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg></button>
+      </div>
+      <div class="flow__info">
+        <span class="flow__count"><b class="flow__index">01</b> / <span class="flow__total">01</span></span>
+        <div class="flow__text"><p class="flow__client"></p><h3 class="flow__title"></h3></div>
+        <button class="btn btn--glass btn--sm flow__play">Watch <svg viewBox="0 0 16 16"><path d="M5 3.5v9l7-4.5z" class="fill"/></svg></button>
+      </div>
+    </section>
+
+    <!-- ABOUT + EXPERIENCE -->
+    <section class="about" id="about">
+      <div class="about__grid">
+        <div class="about__portrait" data-reveal>
+          <div class="portrait"><span class="portrait__initial"></span><span class="orb orb--c"></span></div>
+          <div class="about__meta">
+            <p class="about__name" data-site="fullName"></p>
+            <p class="muted"><span data-site="role"></span> · <span data-site="location"></span></p>
+          </div>
+        </div>
+        <div class="about__body">
+          <h2 class="rule-title rule-title--left" data-reveal><span class="script" data-about="0"></span><span data-about="1"></span></h2>
+          <p class="scrub"></p>
+          <ol class="xp"></ol>
+          <div class="tools" data-reveal></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA (AXIS-style gradient card) -->
+    <section class="cta" id="contact">
+      <div class="cta__card" data-reveal>
+        <div class="cta__copy">
+          <h2 class="cta__title">
+            <span data-cta="lineOne"></span><br>
+            <em class="accent" data-cta="accent"></em><br>
+            <span data-cta="lineTwo"></span>
+          </h2>
+          <p class="cta__text" data-cta="text"></p>
+          <form class="cta__form">
+            <input type="text" name="msg" placeholder="Tell me about your project…" aria-label="Your message">
+            <button type="submit" aria-label="Send by email"><svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></button>
+          </form>
+          <div class="cta__links"></div>
+        </div>
+        <div class="cta__visual" aria-hidden="true">
+          <div class="phone"><video muted loop playsinline preload="none"></video></div>
+          <span class="orb orb--d"></span>
+          <span class="orb orb--e"></span>
+        </div>
+      </div>
+      <footer class="footer">
+        <span>© <span class="year"></span> <span data-site="fullName"></span></span>
+        <span class="muted">Edited in <span data-site="location"></span></span>
+        <a href="#top" class="footer__top">Back to top ↑</a>
+      </footer>
+    </section>
+    </div>
+  </main>
+
+  <!-- Video lightbox -->
+  <div class="lightbox" role="dialog" aria-modal="true" aria-label="Video player" hidden>
+    <button class="lightbox__close" aria-label="Close">×</button>
+    <div class="lightbox__media"></div>
+    <div class="lightbox__caption"></div>
+  </div>
+
+  <div class="cursor" aria-hidden="true"><span class="cursor__label">Play</span></div>
+
+  <script src="content.js?v=13"></script>
+  <script src="works.js?v=13"></script>
+  <script src="js/main.js?v=13"></script>
+</body>
+</html>
