@@ -63,28 +63,8 @@
   font: 700 clamp(70px, 8vw, 130px)/0.85 var(--sans); letter-spacing: -0.06em; text-transform: uppercase;
   color: transparent; -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.7);
 }
-.pd--subject, .pd--xray { inset: 0; width: 100%; height: 100%; }
-.pd--subject { object-fit: cover; filter: drop-shadow(0 30px 40px rgba(0, 0, 0, 0.55)); }
-.pd--xray {
-  --mx: 50%; --my: 45%; --r: 0px;
-  -webkit-mask-image: radial-gradient(circle var(--r) at var(--mx) var(--my), #000 70%, transparent 100%);
-          mask-image: radial-gradient(circle var(--r) at var(--mx) var(--my), #000 70%, transparent 100%);
-}
-.pd--xray img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.7) brightness(1.15); }
-.pd--xray::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background: repeating-linear-gradient(0deg, rgba(200, 242, 140, 0.16) 0 1px, transparent 1px 7px), repeating-linear-gradient(90deg, rgba(200, 242, 140, 0.1) 0 1px, transparent 1px 7px), rgba(10, 20, 60, 0.35); }
-.pd--xray .pd__mesh { z-index: 2; }
-.pd__lens { position: absolute; z-index: 3; width: calc(var(--r) * 1.6); height: calc(var(--r) * 1.6); left: var(--mx); top: var(--my); transform: translate(-50%, -50%) translateZ(60px);
-  border-radius: 50%; border: 1.5px solid var(--lime); box-shadow: 0 0 18px rgba(200, 242, 140, 0.5), inset 0 0 18px rgba(200, 242, 140, 0.25); pointer-events: none; }
-.pd__mesh { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.pd__mesh path { fill: none; stroke: var(--lime); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
-.pd__mesh rect { fill: none; stroke: #fff; stroke-width: 1.4; vector-effect: non-scaling-stroke; }
-.pd--chip {
-  left: 6%; bottom: 8%; padding: 6px 11px; border-radius: 9px; white-space: nowrap; font: 600 11px var(--sans);
-  background: rgba(12, 12, 16, 0.82); border: 1px solid var(--line-2); opacity: 0; transition: opacity 0.3s;
-}
-.pd--chip b { color: var(--lime); font-weight: 600; }
-.portrait.is-xray .pd--chip { opacity: 1; }
+.pd--subject { inset: 0; width: 100%; height: 100%; object-fit: cover; filter: drop-shadow(0 30px 40px rgba(0, 0, 0, 0.55)); }
+.pd--splats { left: -30%; top: -22%; width: 160%; height: 140%; pointer-events: none; filter: blur(0.7px); }
 
 @media (max-width: 640px) {
   .manifesto { height: 180vh; }
@@ -94,3 +74,11 @@
 @media (prefers-reduced-motion: reduce) {
   .signoff__sig text { stroke-dashoffset: 0; fill: var(--lime); }
 }
+
+/* ───────── Hero: tapered pen-path line ───────── */
+.hero__path { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; overflow: visible; pointer-events: none; }
+.hero__path path { fill: none; stroke: url(#heroPathGrad); stroke-width: 3; stroke-linecap: round;
+  stroke-dasharray: 1500; stroke-dashoffset: 1500; transition: stroke-dashoffset 2.6s var(--ease) 0.8s;
+  filter: drop-shadow(0 0 6px rgba(74, 109, 255, 0.6)); }
+body.is-loaded .hero__path path { stroke-dashoffset: 0; }
+@media (max-width: 640px) { .hero__path { opacity: 0.7; } }

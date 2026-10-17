@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Mrs+Saint+Delafield&family=Inter:wght@400;500&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=21">
-  <link rel="stylesheet" href="css/fx.css?v=21">
+  <link rel="stylesheet" href="css/style.css?v=24">
+  <link rel="stylesheet" href="css/fx.css?v=24">
 </head>
 <body class="is-loading">
 
@@ -66,6 +66,11 @@
           <p class="hero__role"><span data-site="role"></span> · <span data-site="location"></span></p>
         </div>
         <div class="hero__stage" aria-hidden="true">
+          <svg class="hero__path" viewBox="0 0 700 700" preserveAspectRatio="none">
+            <defs><linearGradient id="heroPathGrad" x1="0" x2="1" y1="0" y2="0">
+              <stop offset="0" stop-color="#4a6dff" stop-opacity="0"/><stop offset=".25" stop-color="#4a6dff"/><stop offset=".7" stop-color="#6d8bff"/><stop offset="1" stop-color="#c8f28c" stop-opacity="0"/></linearGradient></defs>
+            <path d="M-60 650 C 80 520, 170 700, 300 560 S 560 430, 760 520"/>
+          </svg>
           <div class="fan"></div>
           <span class="orb orb--a"></span>
           <span class="orb orb--b"></span>
@@ -161,14 +166,8 @@
         <div class="about__portrait" data-reveal>
           <div class="portrait3d"><div class="portrait"><span class="portrait__initial"></span><span class="orb orb--c"></span>
             <div class="portrait__depth" aria-hidden="true">
-              <span class="pd pd--name" data-z="-70"></span>
               <img class="pd pd--subject" data-z="45" src="assets/img/me-cutout.png" alt="">
-              <div class="pd pd--xray" data-z="46"><img src="assets/img/me-cutout.png" alt="">
-                <svg class="pd__mesh" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M37 48 L60 48 L47 60 Z M37 48 L48 70 L60 48 M47 60 L48 70"/>
-                  <rect x="35.5" y="46.5" width="3" height="3"/><rect x="58.5" y="46.5" width="3" height="3"/><rect x="45.5" y="58.5" width="3" height="3"/><rect x="46.5" y="68.5" width="3" height="3"/></svg>
-              </div>
-              <span class="pd pd--chip" data-z="80">Face track <b>· 4 pts</b></span>
-              <span class="pd__lens"></span>
+<canvas class="pd pd--splats" data-z="70"></canvas>
             </div>
           </div></div>
           <div class="about__meta">
@@ -225,9 +224,9 @@
 
   <div class="cursor" aria-hidden="true"><span class="cursor__label">Play</span></div>
 
-  <script src="content.js?v=21"></script>
-  <script src="works.js?v=21"></script>
-  <script src="js/main.js?v=21"></script>
-  <script src="js/fx.js?v=21"></script>
+  <script src="content.js?v=24"></script>
+  <script src="works.js?v=24"></script>
+  <script src="js/main.js?v=24"></script>
+  <script src="js/fx.js?v=24"></script>
 </body>
 </html>
