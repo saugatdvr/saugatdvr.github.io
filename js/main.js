@@ -14,6 +14,7 @@
   const finePointer = matchMedia("(pointer: fine)").matches;
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const isVertical = (w) => (w.h || 16) >= (w.w || 9);
+  const bySlug = (slug) => WORKS.find((w) => w.slug === slug);
 
   function makeVideo(src, poster, { autoplay = false } = {}) {
     const v = document.createElement("video");
@@ -109,6 +110,8 @@
       `<div><div class="bento__label">${esc(s.label)}</div><div class="bento__value">${esc(s.value)}</div></div>
        <div class="bento__foot"><span class="bento__icon">${ICONS[s.icon] || ICONS.spark}</span><p class="bento__text">${esc(s.text)}</p></div>`);
     c.type = "button";
+    const sw = s.video && bySlug(s.video);
+    if (sw?.type === "video") { const v = makeVideo(sw.loop || sw.src, sw.poster); v.className = "bento__video"; c.prepend(v); c.classList.add("has-video"); }
     const activate = () => $$(".bento__card").forEach((x) => x.classList.toggle("is-active", x === c));
     c.addEventListener("mouseenter", activate); c.addEventListener("focus", activate); c.addEventListener("click", activate);
     bento.append(c);
@@ -166,7 +169,8 @@
 
   /* ── Hero: fanned 3D cards ── */
   const fan = $(".fan");
-  const heroWorks = [...WORKS.filter(isVertical), ...WORKS.filter((w) => !isVertical(w))].slice(0, 5);
+  const picked = (SITE.heroVideos || []).map(bySlug).filter(Boolean);
+  const heroWorks = (picked.length ? picked : [...WORKS.filter(isVertical), ...WORKS.filter((w) => !isVertical(w))]).slice(0, 5);
   const POSES = [
     { x: -1.12, y: 0.3, rz: -12, ry: 18, z: -140 },
     { x: -0.5, y: 0.1, rz: -5, ry: 10, z: -50 },
@@ -256,7 +260,7 @@
 
   /* ── CTA phone ── */
   const phoneVideo = $(".phone video");
-  const phoneWork = WORKS.filter(isVertical)[1] || WORKS[0];
+  const phoneWork = bySlug(SITE.phoneVideo) || WORKS.filter(isVertical)[1] || WORKS[0];
   if (phoneWork?.type === "video") { phoneVideo.dataset.src = phoneWork.loop || phoneWork.src; phoneVideo.poster = phoneWork.poster || ""; phoneVideo.muted = true; }
   else $(".phone").style.display = "none";
 
@@ -321,72 +325,19 @@
   liveClips.forEach((c) => c.node.addEventListener("click", () => setPlayhead((c.start + 0.5) / 100)));
   setPlayhead(0.1);
 
-  /* ── Graph editor (drag the bezier handles) ── */
-  const svg = $(".graph__svg"), curvePath = $(".graph__curve"), handles = $$(".graph__handle"), arms = $$(".graph__arm");
-  const ball = $(".graph__ball"), gVal = $(".graph__val"), presets = $$(".graph__presets button");
-  $(".graph__grid").innerHTML = [0, 50, 100, 150, 200].map((v) => `<line x1="${v}" y1="0" x2="${v}" y2="200"/><line x1="0" y1="${v}" x2="200" y2="${v}"/>`).join("")
-    + '<line class="graph__axis" x1="0" y1="200" x2="200" y2="200"/><line class="graph__axis" x1="0" y1="0" x2="0" y2="200"/>';
-  let bez = [0.7, 0, 0.2, 1];
-  const fmt = (n) => +n.toFixed(2);
-  function drawGraph() {
-    const [x1, y1, x2, y2] = bez, P1 = [x1 * 200, 200 - y1 * 200], P2 = [x2 * 200, 200 - y2 * 200];
-    curvePath.setAttribute("d", `M0 200 C${P1} ${P2} 200 0`);
-    handles[0].setAttribute("cx", P1[0]); handles[0].setAttribute("cy", P1[1]);
-    handles[1].setAttribute("cx", P2[0]); handles[1].setAttribute("cy", P2[1]);
-    arms[0].setAttribute("x1", 0); arms[0].setAttribute("y1", 200); arms[0].setAttribute("x2", P1[0]); arms[0].setAttribute("y2", P1[1]);
-    arms[1].setAttribute("x1", 200); arms[1].setAttribute("y1", 0); arms[1].setAttribute("x2", P2[0]); arms[1].setAttribute("y2", P2[1]);
-    gVal.textContent = `cubic-bezier(${bez.map(fmt).join(", ")})`;
-    ball.style.transitionTimingFunction = `cubic-bezier(${bez.join(",")})`;
-  }
-  let dragH = null;
-  const toGraph = (e) => {
-    const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
-    const g = pt.matrixTransform(svg.getScreenCTM().inverse());
-    return [clamp(g.x / 200), clamp((200 - g.y) / 200, -0.3, 1.3)];
-  };
-  handles.forEach((h, i) => {
-    h.addEventListener("pointerdown", (e) => { dragH = i; h.classList.add("is-drag"); h.setPointerCapture(e.pointerId); e.preventDefault(); });
-    h.addEventListener("pointermove", (e) => {
-      if (dragH !== i) return;
-      const [x, y] = toGraph(e);
-      bez[i * 2] = x; bez[i * 2 + 1] = y;
-      presets.forEach((b) => b.classList.remove("is-on"));
-      drawGraph();
-    });
-    h.addEventListener("pointerup", () => { dragH = null; h.classList.remove("is-drag"); });
-    h.addEventListener("keydown", (e) => {
-      const step = { ArrowLeft: [-0.05, 0], ArrowRight: [0.05, 0], ArrowUp: [0, 0.05], ArrowDown: [0, -0.05] }[e.key];
-      if (!step) return; e.preventDefault();
-      bez[i * 2] = clamp(bez[i * 2] + step[0]); bez[i * 2 + 1] = clamp(bez[i * 2 + 1] + step[1], -0.3, 1.3); drawGraph();
-    });
-  });
-  presets.forEach((b) => b.addEventListener("click", () => {
-    bez = b.dataset.p.split(",").map(Number);
-    presets.forEach((x) => x.classList.toggle("is-on", x === b)); drawGraph();
-  }));
-  drawGraph();
-  // the ball ping-pongs between two keyframes using the current curve
-  let ballSide = false, graphVisible = false;
-  ball.style.transition = "transform 1.1s";
-  setInterval(() => {
-    if (!graphVisible || document.hidden) return;
-    ballSide = !ballSide;
-    const travel = ball.parentElement.offsetWidth - 34;
-    ball.style.transform = `translateX(${ballSide ? travel : 0}px)`;
-  }, 1500);
-
   /* ── Play/pause videos by visibility ── */
   const inView = new Map();
   const vis = new IntersectionObserver((entries) => entries.forEach((en) => {
     const t = en.target;
     inView.set(t, en.isIntersecting);
     if (t === flow) { flowVisible = en.isIntersecting; layoutFlow(false); return; }
-    if (t === tl || t === curve || t === scrub || t === $(".graph")) { if (t.classList.contains("graph")) graphVisible = en.isIntersecting; return; }
+    if (t === tl || t === curve || t === scrub || t.dataset.fx) return;
     $$("video", t).forEach((v) => (en.isIntersecting ? play(v) : v.pause()));
   }), { rootMargin: "100px" });
-  [$(".hero__stage"), $(".cta__visual"), flow, tl, curve, scrub, $(".graph")].forEach((n) => n && vis.observe(n));
+  const fxEls = $$("[data-fx]");
+  [$(".hero__stage"), $(".cta__visual"), flow, tl, curve, scrub, bento, ...fxEls].forEach((n) => n && vis.observe(n));
   document.addEventListener("visibilitychange", () => $$("video").forEach((v) => {
-    if (document.hidden) v.pause(); else if (v.closest(".lightbox") || inView.get(v.closest(".hero__stage, .cta__visual")) || v.closest(".slide.is-center")) play(v);
+    if (document.hidden) v.pause(); else if (v.closest(".lightbox") || inView.get(v.closest(".hero__stage, .cta__visual, .bento")) || v.closest(".slide.is-center")) play(v);
   }));
 
   /* ── Reveal on scroll + count-up ── */
@@ -437,11 +388,40 @@
     if (!desktop) { heroInner.style.transform = ""; heroInner.style.opacity = ""; }
   };
   measure();
-  let pnx = 0, pny = 0, last = performance.now(), lastOn = -1, tlTarget = 0.1;
+  let pnx = 0, pny = 0, last = performance.now(), lastOn = -1, tlTarget = 0.1, lastSy = scrollY, vel = 0;
+  const clientsTrack = $(".clients__track");
+  const fxLast = new Map();
+  // scroll-linked transitions: each [data-fx] element eases into place as it travels up the screen
+  function applyFx(node, vh) {
+    const r = node.getBoundingClientRect();
+    const p = ease(clamp((vh - r.top) / (vh * 0.7)));
+    if (Math.abs((fxLast.get(node) ?? -1) - p) < 0.001) return;
+    fxLast.set(node, p);
+    const q = 1 - p, fx = node.dataset.fx;
+    if (fx === "tilt") {
+      node.style.transform = `perspective(1400px) translateY(${q * 70}px) rotateX(${q * 26}deg) scale(${0.9 + p * 0.1})`;
+      node.style.opacity = 0.25 + p * 0.75;
+    } else if (fx === "push") {
+      node.style.transform = `perspective(1600px) translateY(${q * 90}px) rotateX(${q * 34}deg) scale(${0.82 + p * 0.18})`;
+      node.style.opacity = 0.2 + p * 0.8;
+    } else if (fx === "grow") {
+      node.style.transform = `translateY(${q * 60}px) scale(${0.84 + p * 0.16})`;
+      node.style.opacity = 0.3 + p * 0.7;
+    } else if (fx === "split") {
+      const [a, b] = node.children, d = q * Math.min(innerWidth * 0.14, 220);
+      if (a) a.style.transform = `translateX(${-d}px) skewX(${q * 12}deg)`;
+      if (b) b.style.transform = `translateX(${d}px) skewX(${-q * 12}deg)`;
+      node.style.opacity = 0.15 + p * 0.85;
+    }
+  }
   function frame(now) {
     const dt = Math.min(64, now - last); last = now;
     const vh = innerHeight, sy = scrollY;
+    vel = lerp(vel, clamp((sy - lastSy) / Math.max(dt, 1), -4, 4), 0.12); lastSy = sy;
     pnx = lerp(pnx, nx, 0.06); pny = lerp(pny, ny, 0.06);
+    if (!reduced) for (const n of fxEls) if (inView.get(n)) applyFx(n, vh);
+    // the brand strip leans with scroll speed, like a whip pan
+    if (clientsTrack && sy < vh * 2.5) clientsTrack.parentElement.style.transform = `skewX(${clamp(-vel * 6, -10, 10)}deg)`;
     if (finePointer) { cx = lerp(cx, mx, 0.2); cy = lerp(cy, my, 0.2); cursor.style.transform = `translate3d(${cx}px, ${cy}px, 0)`; }
 
     // hero: shrink as the next panel slides over it (desktop, where it's sticky) + fanned cards
@@ -466,7 +446,7 @@
 
     // curved kinetic wall
     if (inView.get(curve) && tiles.length) {
-      curveX = (curveX + dt * 0.045) % loopW;
+      curveX = (curveX + dt * 0.045 * (1 + Math.abs(vel) * 2.5)) % loopW;
       const mid = curveW / 2, per = tileW + gap;
       for (let i = 0; i < tiles.length; i++) {
         let x = i * per - curveX;

@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=13">
+  <link rel="stylesheet" href="css/style.css?v=15">
 </head>
 <body class="is-loading">
 
@@ -81,7 +81,7 @@
 
     <!-- KINETIC TILES (Captions-style "What's included") -->
     <section class="skills" id="skills">
-      <h2 class="rule-title" data-reveal><span class="script" data-skills="0"></span><span data-skills="1"></span></h2>
+      <h2 class="rule-title" data-fx="split"><span class="script" data-skills="0"></span><span data-skills="1"></span></h2>
       <div class="curve" aria-hidden="true"><div class="curve__track"></div></div>
       <div class="stats" data-reveal></div>
     </section>
@@ -95,15 +95,15 @@
           <a class="btn btn--lime btn--sm" href="#contact">Start a project</a>
         </div>
       </div>
-      <div class="bento"></div>
+      <div class="bento" data-fx="tilt"></div>
     </section>
 
-    <!-- INTERACTIVE 3D TIMELINE + GRAPH EDITOR -->
+    <!-- INTERACTIVE 3D TIMELINE -->
     <section class="edit" id="process">
-      <h2 class="rule-title" data-reveal><span class="script">Inside</span><span>the timeline</span></h2>
-      <p class="edit__hint" data-reveal>Scroll or hover to scrub the playhead · drag the curve handles</p>
+      <h2 class="rule-title" data-fx="split"><span class="script">Inside</span><span>the timeline</span></h2>
+      <p class="edit__hint" data-reveal>Scroll or hover to scrub the playhead · click any clip to jump to it</p>
       <div class="edit__grid">
-        <div class="tl" data-reveal aria-label="Interactive 3D editing timeline">
+        <div class="tl" data-fx="push" aria-label="Interactive 3D editing timeline">
           <div class="tl__stage">
             <div class="tl__rig">
               <div class="tl__ruler"></div>
@@ -116,37 +116,14 @@
             <div class="tl__bar"><span class="tl__rec"></span><span class="tl__tc">00:00:00:00</span></div>
           </div>
         </div>
-        <div class="graph" data-reveal>
-          <div class="graph__head">
-            <span>Graph editor</span>
-            <code class="graph__val">cubic-bezier(0.7, 0, 0.2, 1)</code>
-          </div>
-          <svg class="graph__svg" viewBox="-12 -62 224 324" aria-label="Easing curve, drag the two handles">
-            <g class="graph__grid"></g>
-            <line class="graph__arm graph__arm--1" />
-            <line class="graph__arm graph__arm--2" />
-            <path class="graph__curve" />
-            <circle class="graph__end" cx="0" cy="200" r="4" />
-            <circle class="graph__end" cx="200" cy="0" r="4" />
-            <circle class="graph__handle" data-h="1" r="8" tabindex="0" />
-            <circle class="graph__handle" data-h="2" r="8" tabindex="0" />
-          </svg>
-          <div class="graph__demo"><span class="graph__key"></span><span class="graph__key graph__key--end"></span><span class="graph__ball"></span></div>
-          <div class="graph__presets">
-            <button type="button" data-p="0,0,1,1">Linear</button>
-            <button type="button" data-p="0.33,0,0.67,1">Easy ease</button>
-            <button type="button" data-p="0.7,0,0.2,1" class="is-on">Snappy</button>
-            <button type="button" data-p="0.3,1.6,0.5,1">Overshoot</button>
-          </div>
-        </div>
       </div>
     </section>
 
     <!-- WORK COVERFLOW (Captions-style "Features") -->
     <section class="work" id="work">
-      <h2 class="big-title" data-reveal><em class="script">Selected</em> work</h2>
+      <h2 class="big-title" data-fx="split"><em class="script">Selected</em> <span>work</span></h2>
       <p class="work__hint" data-reveal>Drag, swipe or use the arrows. Click a video to watch with sound.</p>
-      <div class="flow">
+      <div class="flow" data-fx="tilt">
         <div class="flow__stage"></div>
         <button class="flow__arrow flow__arrow--prev" aria-label="Previous project"><svg viewBox="0 0 16 16"><path d="M10 3L5 8l5 5"/></svg></button>
         <button class="flow__arrow flow__arrow--next" aria-label="Next project"><svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg></button>
@@ -169,7 +146,7 @@
           </div>
         </div>
         <div class="about__body">
-          <h2 class="rule-title rule-title--left" data-reveal><span class="script" data-about="0"></span><span data-about="1"></span></h2>
+          <h2 class="rule-title rule-title--left" data-fx="split"><span class="script" data-about="0"></span><span data-about="1"></span></h2>
           <p class="scrub"></p>
           <ol class="xp"></ol>
           <div class="tools" data-reveal></div>
@@ -179,7 +156,7 @@
 
     <!-- CTA (AXIS-style gradient card) -->
     <section class="cta" id="contact">
-      <div class="cta__card" data-reveal>
+      <div class="cta__card" data-fx="grow">
         <div class="cta__copy">
           <h2 class="cta__title">
             <span data-cta="lineOne"></span><br>
@@ -217,8 +194,8 @@
 
   <div class="cursor" aria-hidden="true"><span class="cursor__label">Play</span></div>
 
-  <script src="content.js?v=13"></script>
-  <script src="works.js?v=13"></script>
-  <script src="js/main.js?v=13"></script>
+  <script src="content.js?v=15"></script>
+  <script src="works.js?v=15"></script>
+  <script src="js/main.js?v=15"></script>
 </body>
 </html>

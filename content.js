@@ -26,6 +26,11 @@ window.SITE = {
     text: "I cut short-form reels, brand ads and motion graphics that stop the scroll and keep people watching to the very last frame.",
   },
 
+  // The 5 fanned cards at the top (centre one is at the front) and the phone in the contact card.
+  // Use the names from workInfo below.
+  heroVideos: ["yolo-v2-1", "ultima-cine-3", "e-sewa", "babal-host-v1", "ultima-cine-1"],
+  phoneVideo: "ultima-cine-3",
+
   // The animated tiles under the hero
   skillsTitle: ["What", "I do"],
   skills: ["Cut", "Rise", "Captions", "Glow", "Kinetic", "Colour", "Sound", "Story", "Shine", "Motion"],
@@ -40,13 +45,13 @@ window.SITE = {
     title: "One editor for\neverything you post",
     text: "From raw footage to a finished, scroll-stopping post: editing, motion graphics, captions, colour and sound, all handled in one place.",
     items: [
-      { label: "Short-form", value: "Reels", icon: "reel",
+      { label: "Short-form", value: "Reels", icon: "reel", video: "yolo-v6",
         text: "Instagram Reels, TikToks and Shorts cut for retention: tight pacing, hooks in the first second and clean story flow." },
-      { label: "After Effects", value: "Motion", icon: "motion",
+      { label: "After Effects", value: "Motion", icon: "motion", video: "e-sewa",
         text: "Kinetic typography, animated UI cards, logo reveals and graphics that explain your product in seconds." },
-      { label: "Brand & Ads", value: "Promos", icon: "spark",
+      { label: "Brand & Ads", value: "Promos", icon: "spark", video: "notnorml-video2-main-1",
         text: "Product ads and launch videos for brands, with on-brand fonts, colours and a clear call to action." },
-      { label: "Finishing", value: "Colour", icon: "wave",
+      { label: "Finishing", value: "Colour", icon: "wave", video: "insta-v2",
         text: "Colour grading, sound design, music sync and styled captions in English and Romanized Nepali." },
     ],
   },
@@ -76,24 +81,30 @@ window.SITE = {
   tools: ["After Effects", "DaVinci Resolve", "Premiere Pro", "Photoshop", "Canva", "Blender"],   // ✏️ remove any you don't use
 
   // Brands you've worked with (scrolling strip)   ✏️ confirm these
-  clients: ["YOLO", "Ultima Lifestyle", "Babal Host", "Nest Nepal", "Siddhartha Capital", "Nest SMS", "SMS Pasal"],
+  clients: ["eSewa", "YOLO", "Ultima Lifestyle", "Babal Host", "Nest Nepal", "Siddhartha Capital", "Talent Sathi", "Nest SMS", "SMS Pasal"],
 
   // Names + order for the videos in "best work".  ✏️ titles are my guesses from the thumbnails — fix them
-  // The key on the left is the file name in lowercase with dashes (version numbers like "v2.1" are dropped,
-  // and a second file with the same name gets "-2"). Lower "order" = shown first. The first 5 go in the hero.
+  // The key on the left is the file name in lowercase with dashes ("Yolo v6.mp4" → "yolo-v6",
+  // "Babal host v2.1.mp4" → "babal-host-v2-1"). Lower "order" = shown first in the work carousel.
   workInfo: {
-    "yolo":               { order: 1,  client: "YOLO",               title: "Become a Retail Partner" },
-    "ultima-cine-1":      { order: 2,  client: "Ultima",             title: "Diva — Black Edition" },
-    "babal-host":         { order: 3,  client: "Babal Host",         title: "Hosting, Explained" },
-    "nest-nepal":         { order: 4,  client: "Nest Nepal",         title: "Free Zoom, 40 Minutes" },
-    "ultima-sc-9":        { order: 5,  client: "Ultima",             title: "Faster, Every Day" },
-    "siddhartha-capital": { order: 6,  client: "Siddhartha Capital", title: "14 Years in Nepal's Capital Market" },
-    "babal-host-2":       { order: 7,  client: "Babal Host",         title: "Website, Email & Domain" },
-    "nest-sms":           { order: 8,  client: "Nest SMS",           title: "Bulk SMS for Business" },
-    "ultima-cine-3":      { order: 9,  client: "Ultima",             title: "Rose Gold, Cinematic" },
-    "sms-pasal":          { order: 10, client: "SMS Pasal",          title: "Brand Promo" },
-    "nest":               { order: 11, client: "Nest Nepal",         title: "Grow Online" },
-    "yolo-2":             { order: 12, client: "YOLO",               title: "Brand Story" },
+    "e-sewa":                 { order: 1,  client: "eSewa",              title: "Everyday Payments, Together" },
+    "ultima-cine-3":          { order: 2,  client: "Ultima",             title: "Rose Gold, Cinematic" },
+    "insta-edit":             { order: 3,  client: "Instagram Edit",     title: "Notice, Animated" },
+    "yolo-v2-1":              { order: 4,  client: "YOLO",               title: "Become a Retail Partner" },
+    "ultima-cine-1":          { order: 5,  client: "Ultima",             title: "Diva — Black Edition" },
+    "babal-host-v1":          { order: 6,  client: "Babal Host",         title: "Hosting, Explained" },
+    "notnorml-video2-main-1": { order: 7,  client: "NotNorml Media",     title: "Turn Clicks into Customers" },
+    "nest-nepal-v2-1":        { order: 8,  client: "Nest Nepal",         title: "Free Zoom, 40 Minutes" },
+    "insta-v2":               { order: 9,  client: "Colour Grade",       title: "Car Reel, Final Grade" },
+    "ultima-sc-9":            { order: 10, client: "Ultima",             title: "Faster, Every Day" },
+    "siddhartha-capital":     { order: 11, client: "Siddhartha Capital", title: "14 Years in Nepal's Capital Market" },
+    "yolo-v6":                { order: 12, client: "YOLO",               title: "Ramro, Brand Story" },
+    "babal-host-v2-1":        { order: 13, client: "Babal Host",         title: "Website, Email & Domain" },
+    "talent-sathi":           { order: 14, client: "Talent Sathi",       title: "Hiring, Explained" },
+    "nest-sms-v1":            { order: 15, client: "Nest SMS",           title: "Bulk SMS for Business" },
+    "sms-pasal":              { order: 16, client: "SMS Pasal",          title: "Brand Promo" },
+    "yolo-v1":                { order: 17, client: "YOLO",               title: "If You're Watching This" },
+    "nest-v2-1":              { order: 18, client: "Nest Nepal",         title: "Grow Online" },
   },
 
   cta: {

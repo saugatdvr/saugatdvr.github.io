@@ -4,7 +4,8 @@
 Name files like:  01 Client - Project title.mp4
   - the number sets the order (optional)
   - "Client - Title" become the card labels
-  - add a .txt with the same name for a one-line description (optional)
+  - add a .txt with the same name for a one-line description (optional).
+    A line like "start: 0" in that .txt makes the preview loop start at that second.
 
 Videos are compressed so the site loads fast and fits on GitHub (100 MB/file limit).
 """
@@ -12,7 +13,9 @@ import json, os, re, shutil, subprocess, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SRC = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "best work"
+ARGS = [a for a in sys.argv[1:] if a != "--force"]
+FORCE = "--force" in sys.argv  # re-encode everything, e.g. after changing quality settings
+SRC = Path(ARGS[0]) if ARGS else ROOT / "best work"
 OUT = ROOT / "assets" / "work"
 VIDEO = {".mp4", ".mov", ".m4v", ".webm", ".mkv"}
 IMAGE = {".png", ".jpg", ".jpeg", ".webp"}
@@ -57,7 +60,7 @@ def probe(path):
 
 
 def stale(out, src):
-    return not out.exists() or out.stat().st_mtime < src.stat().st_mtime
+    return FORCE or not out.exists() or out.stat().st_mtime < src.stat().st_mtime
 
 
 def run(args):
@@ -80,7 +83,7 @@ def best_moment(src, dur):
     return max(0.0, min(best - 1, dur - 7))
 
 
-def build_video(src, slug):
+def build_video(src, slug, start_at=None):
     w, h, dur = probe(src)
     full, loop, poster = OUT / f"{slug}.mp4", OUT / f"{slug}-loop.mp4", OUT / f"{slug}.jpg"
     long_side = "1280"
@@ -88,21 +91,24 @@ def build_video(src, slug):
     if stale(full, src):
         print(f"  compressing  {src.name}")
         # GitHub's drag-and-drop upload takes files up to 25 MB, so squeeze harder until it fits
-        for crf in (26, 29, 32, 35):
+        for crf in (23, 26, 29, 32, 35):
             run(["-i", str(src), "-vf", scale, "-c:v", "libx264", "-preset", "slow", "-crf", str(crf),
                  "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart", str(full)])
             if full.stat().st_size < MAX_BYTES:
                 break
             print(f"  still {full.stat().st_size / 1e6:.0f} MB, compressing more…")
-    start = best_moment(src, dur) if stale(loop, src) or stale(poster, src) else 0
+    if start_at is not None:
+        start = min(start_at, max(0.0, dur - 6))
+    else:
+        start = best_moment(src, dur) if stale(loop, src) or stale(poster, src) else 0
     if stale(loop, src):
         print(f"  preview loop {src.name}")
         small = scale.replace(long_side, "720")
         run(["-ss", f"{start:.2f}", "-t", "6", "-i", str(src), "-vf", small, "-an", "-c:v", "libx264",
-             "-preset", "slow", "-crf", "29", "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(loop)])
+             "-preset", "slow", "-crf", "22", "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(loop)])
     if stale(poster, src):
-        run(["-ss", f"{start + 0.5:.2f}", "-i", str(src), "-frames:v", "1",
-             "-vf", scale.replace(long_side, "900"), "-q:v", "4", str(poster)])
+        run(["-ss", f"{start + 0.3:.2f}", "-i", str(src), "-frames:v", "1",
+             "-vf", scale.replace(long_side, "900"), "-q:v", "3", str(poster)])
     return {"type": "video", "w": w, "h": h, "duration": round(dur, 1),
             "src": f"assets/work/{full.name}", "loop": f"assets/work/{loop.name}",
             "poster": f"assets/work/{poster.name}"}, {full.name, loop.name, poster.name}
@@ -130,14 +136,20 @@ def main():
     print(f"Building {len(files)} item(s) from {SRC.name}/ ...")
     for src in files:
         order, client, title = parse_name(src.stem)
-        slug = slugify(f"{client} {title}")
+        # slug keeps the version ("yolo-v6") so each file has its own stable name for content.js
+        slug = slugify(re.sub(r"^\s*\d+[\s._-]+", "", src.stem))
         while slug in used:
             slug += "-2"
         used.add(slug)
-        item, names = (build_video if src.suffix.lower() in VIDEO else build_image)(src, slug)
         note = src.with_suffix(".txt")
-        item.update({"order": order, "slug": slug, "client": client, "title": title,
-                     "description": note.read_text().strip() if note.exists() else ""})
+        lines = note.read_text().splitlines() if note.exists() else []
+        starts = [l.split(":", 1)[1] for l in lines if l.lower().startswith("start:")]
+        desc = "\n".join(l for l in lines if not l.lower().startswith("start:")).strip()
+        if src.suffix.lower() in VIDEO:
+            item, names = build_video(src, slug, float(starts[0]) if starts else None)
+        else:
+            item, names = build_image(src, slug)
+        item.update({"order": order, "slug": slug, "client": client, "title": title, "description": desc})
         works.append(item)
         keep |= names
     for old in OUT.iterdir():
