@@ -112,11 +112,26 @@
     c.type = "button";
     const sw = s.video && bySlug(s.video);
     if (sw?.type === "video") { const v = makeVideo(sw.loop || sw.src, sw.poster); v.className = "bento__video"; c.prepend(v); c.classList.add("has-video"); }
-    const activate = () => $$(".bento__card").forEach((x) => x.classList.toggle("is-active", x === c));
+    const activate = () => { $$(".bento__card").forEach((x) => x.classList.toggle("is-active", x === c)); syncBentoVideos(); };
     c.addEventListener("mouseenter", activate); c.addEventListener("focus", activate); c.addEventListener("click", activate);
     bento.append(c);
   });
   bento.children[Math.min(2, svc.length - 1)]?.classList.add("is-active");
+
+  let bentoOn = false;
+  function syncBentoVideos() {
+    $$(".bento__card").forEach((card) => {
+      const v = $(".bento__video", card); if (!v) return;
+      if (bentoOn && card.classList.contains("is-active")) play(v); else v.pause();
+    });
+  }
+  if (!matchMedia("(min-width: 1001px)").matches) {
+    // stacked cards: whichever card crosses the middle of the screen becomes the playing one
+    const mid = new IntersectionObserver((es) => es.forEach((e) => {
+      if (e.isIntersecting) { $$(".bento__card").forEach((x) => x.classList.toggle("is-active", x === e.target)); syncBentoVideos(); }
+    }), { rootMargin: "-45% 0px -45% 0px" });
+    $$(".bento__card").forEach((c) => mid.observe(c));
+  }
 
   /* ── About: scrubbed paragraph, experience, tools ── */
   const scrub = $(".scrub");
@@ -180,7 +195,12 @@
   ];
   const fanCards = heroWorks.map((w, i) => {
     const c = el("figure", "fan__card");
-    if (w.type === "video") c.append(makeVideo(w.loop || w.src, w.poster, { autoplay: true }));
+    if (w.type === "video") {
+      const outer = heroWorks.length >= 5 && (i === 0 || i === heroWorks.length - 1);
+      const v = makeVideo(w.loop || w.src, w.poster, { autoplay: !outer });
+      if (outer) v.dataset.still = "1";
+      c.append(v);
+    }
     else { const img = new Image(); img.src = w.src; img.alt = ""; c.append(img); }
     c.dataset.cursor = "Play";
     c.addEventListener("click", () => openWork(w));
@@ -198,7 +218,9 @@
       const s = el("div", "slide");
       s.style.aspectRatio = `${w.w || 9} / ${w.h || 16}`;
       if (!isVertical(w)) s.style.height = "56%";
-      const media = w.type === "video" ? makeVideo(w.loop || w.src, w.poster) : Object.assign(new Image(), { src: w.src, alt: w.title || "" });
+      // posters load only when the carousel comes near the screen
+      const media = w.type === "video" ? makeVideo(w.loop || w.src, null) : Object.assign(new Image(), { loading: "lazy", src: w.src, alt: w.title || "" });
+      if (media.tagName === "VIDEO") media.dataset.poster = w.poster || "";
       s.append(media);
       s.append(el("span", "slide__tag", w.type === "video" ? (isVertical(w) ? "Reel" : "Film") : "Design"));
       stage.append(s);
@@ -232,9 +254,14 @@
     $(".flow__title").textContent = w.title || "";
     if (swap) { text.classList.remove("swap"); void text.offsetWidth; text.classList.add("swap"); }
   }
+  let deckKey = "";
   function renderDeck(dt) {
     const n = slides.length; if (!n) return;
     pos = reduced ? active : lerp(pos, active, Math.min(1, dt * 0.0055));
+    if (Math.abs(pos - active) < 0.0005) pos = active;
+    const key = pos.toFixed(4) + (deckHover ? "h" : "") + flow.offsetHeight;
+    if (key === deckKey) return; // nothing moved since the last frame
+    deckKey = key;
     const unit = (flow.offsetHeight * 0.86 * 9) / 16;
     slides.forEach((s, i) => {
       const d = wrapD(i - pos, n), a = Math.abs(d), sg = Math.sign(d);
@@ -358,14 +385,20 @@
   const vis = new IntersectionObserver((entries) => entries.forEach((en) => {
     const t = en.target;
     inView.set(t, en.isIntersecting);
-    if (t === flow) { flowVisible = en.isIntersecting; layoutFlow(false); return; }
-    if (t === tl || t === curve || t === scrub || (t.dataset.fx && t !== bento)) return;
-    $$("video", t).forEach((v) => (en.isIntersecting ? play(v) : v.pause()));
-  }), { rootMargin: "100px" });
+    if (t === flow) {
+      if (en.isIntersecting) slides.forEach((sl) => { if (sl.media.dataset.poster) { sl.media.poster = sl.media.dataset.poster; delete sl.media.dataset.poster; } });
+      flowVisible = en.isIntersecting; flow.classList.toggle("is-on", en.isIntersecting); layoutFlow(false); return;
+    }
+    if (t === curve) { curve.classList.toggle("is-on", en.isIntersecting); return; }
+    if (t === bento) { bentoOn = en.isIntersecting; syncBentoVideos(); return; }
+    if (t === tl || t === scrub || t.dataset.fx) return;
+    $$("video", t).forEach((v) => (en.isIntersecting && !v.dataset.still ? play(v) : v.pause()));
+  }), { rootMargin: "300px" });
   const fxEls = $$("[data-fx]");
   [$(".hero__stage"), $(".cta__visual"), flow, tl, curve, scrub, bento, ...fxEls].forEach((n) => n && vis.observe(n));
   document.addEventListener("visibilitychange", () => $$("video").forEach((v) => {
-    if (document.hidden) v.pause(); else if (v.closest(".lightbox") || inView.get(v.closest(".hero__stage, .cta__visual, .bento")) || v.closest(".slide.is-center")) play(v);
+    if (document.hidden) v.pause();
+    else if (!v.dataset.still && (v.closest(".lightbox") || inView.get(v.closest(".hero__stage, .cta__visual")) || v.closest(".slide.is-center") || (bentoOn && v.closest(".bento__card.is-active")))) play(v);
   }));
 
   /* ── Reveal on scroll + count-up ── */

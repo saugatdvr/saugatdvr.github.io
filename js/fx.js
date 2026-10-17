@@ -70,49 +70,16 @@
     once.observe(sign);
   }
 
-  /* ── Depth portrait: tilts with the page scroll, soft splat particles drift off the edges ── */
-  const portrait = $(".portrait");
+  /* ── Depth portrait: turns in 3D as you scroll through the About section (layers move at different depths) ── */
+  const portrait = $(".portrait"), aboutSec = $(".about");
   const layers = portrait ? $$(".pd", portrait).map((el) => ({ el, z: +el.dataset.z || 0 })) : [];
-  const splatCv = $(".pd--splats"), sctx = splatCv?.getContext("2d");
-  let depthOn = false, splats = [];
+  let depthOn = false;
   if (portrait && SITE.photo) {
     const cut = new Image();
-    cut.onload = () => {
-      portrait.classList.add("has-depth"); depthOn = true; watch(portrait);
-      if (sctx) splats = makeSplats(cut);
-      sizeSplats();
-    };
-    cut.src = "assets/img/me-cutout.png";
-    const name = $(".pd--name"); if (name) name.textContent = SITE.name || "";
+    cut.onload = () => { portrait.classList.add("has-depth"); depthOn = true; watch(aboutSec || portrait); };
+    cut.src = $(".pd--subject")?.getAttribute("src") || "";
   }
-  // pick points along the edge of the cut-out (hair, shoulders) and give each a drift direction
-  function makeSplats(img) {
-    const W = 200, H = 250, c = document.createElement("canvas"); c.width = W; c.height = H;
-    const x = c.getContext("2d"); x.drawImage(img, 0, 0, W, H);
-    let d; try { d = x.getImageData(0, 0, W, H).data; } catch (e) { return []; }
-    const a = (i, j) => (i < 0 || j < 0 || i >= W || j >= H ? 0 : d[(j * W + i) * 4 + 3]);
-    let seed = 5; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-    const out = [], n = innerWidth < 700 ? 70 : 130;
-    for (let k = 0; k < 60000 && out.length < n; k++) {
-      const i = (rnd() * W) | 0, j = (rnd() * H * 0.9) | 0;
-      if (a(i, j) < 150) continue;
-      if (a(i - 4, j) > 40 && a(i + 4, j) > 40 && a(i, j - 4) > 40 && a(i, j + 4) > 40) continue; // only edges
-      const o = (j * W + i) * 4;
-      const dx = i / W - 0.5, dy = j / H - 0.45, len = Math.hypot(dx, dy) || 1;
-      out.push({ u: i / W, v: j / H, ox: dx / len, oy: dy / len, far: 0.25 + rnd() * 1.1, ph: rnd() * 6.28,
-        s: 0.8 + rnd() * 1.9, c: `${Math.min(255, d[o] + 60)},${Math.min(255, d[o + 1] + 60)},${Math.min(255, d[o + 2] + 70)}`, tint: rnd() < 0.07 ? "200,242,140" : null });
-    }
-    return out;
-  }
-  let sw = 0, sh = 0, sdpr = 1;
-  function sizeSplats() {
-    if (!splatCv) return;
-    sdpr = Math.min(devicePixelRatio || 1, 2);
-    sw = splatCv.clientWidth; sh = splatCv.clientHeight;
-    splatCv.width = Math.round(sw * sdpr); splatCv.height = Math.round(sh * sdpr);
-  }
-  addEventListener("resize", sizeSplats);
-  let px = 0, py = 0, mx = 0, my = 0, lastSy = scrollY, vel = 0;
+  let px = 0, py = 0, mx = 0, my = 0, lastPx = 99;
   if (portrait && finePointer) {
     portrait.addEventListener("pointermove", (e) => {
       const b = portrait.getBoundingClientRect();
@@ -150,31 +117,16 @@
       rows[1].parentElement.style.transform = `translateX(${(-58 + c * 28 + drift % 30).toFixed(2)}vw)`;
     }
 
-    vel = lerp(vel, clamp((scrollY - lastSy) / 16, -3, 3), 0.1); lastSy = scrollY;
-    if (depthOn && seen.get(portrait)) {
-      // c: -1 when the portrait is low on screen → 1 when it has scrolled up past the middle
-      const b = portrait.getBoundingClientRect();
-      const c = clamp((vh / 2 - (b.top + b.height / 2)) / (vh / 2), -1, 1);
-      const tx = (reduced ? 0 : c * 0.85) + mx * 0.35, ty = (reduced ? 0 : -c * 0.7) + my * 0.3;
-      px = lerp(px, tx, 0.09); py = lerp(py, ty, 0.09);
-      portrait.style.transform = `rotateY(${(px * 16).toFixed(2)}deg) rotateX(${(-py * 12).toFixed(2)}deg)`;
-      for (const { el, z } of layers) el.style.transform = `translateZ(${z}px) translate(${(px * z * -0.1).toFixed(1)}px, ${(py * z * -0.08).toFixed(1)}px)`;
-
-      if (sctx && splats.length) {
-        sctx.setTransform(sdpr, 0, 0, sdpr, 0, 0);
-        sctx.clearRect(0, 0, sw, sh);
-        // the portrait occupies the middle of the canvas (canvas is 160% × 140% of it)
-        const pw = sw / 1.6, ph = sh / 1.4, ox = sw * 0.1875, oy = sh * 0.157;
-        const spread = 0.35 + Math.abs(c) * 0.9 + Math.abs(vel) * 0.35;
-        for (const p of splats) {
-          const drift = (reduced ? 0.4 : spread) * p.far * 60;
-          const wob = reduced ? 0 : Math.sin(t * 0.8 + p.ph) * 4;
-          const x = ox + p.u * pw + p.ox * drift + wob;
-          const y = oy + p.v * ph + p.oy * drift - vel * 10 * p.far + Math.cos(t * 0.7 + p.ph) * 3;
-          const alpha = clamp(0.55 - drift / 200, 0.08, 0.55);
-          sctx.fillStyle = `rgba(${p.tint || p.c},${alpha.toFixed(2)})`;
-          sctx.beginPath(); sctx.ellipse(x, y, p.s * 1.4, p.s, p.ph, 0, 6.283); sctx.fill();
-        }
+    if (depthOn && seen.get(aboutSec || portrait)) {
+      // the photo sticks while you scroll the About section, so use the section's progress (-1 → 1)
+      const b = (aboutSec || portrait).getBoundingClientRect();
+      const c = clamp((vh - b.top) / (vh + b.height)) * 2 - 1;
+      const tx = (reduced ? 0 : c) + mx * 0.25, ty = (reduced ? 0 : -c * 0.6) + my * 0.2;
+      px = lerp(px, tx, 0.1); py = lerp(py, ty, 0.1);
+      if (Math.abs(px - lastPx) > 0.0008 || Math.abs(py) > 0.0008) {
+        lastPx = px;
+        portrait.style.transform = `rotateY(${(px * 18).toFixed(2)}deg) rotateX(${(-py * 10).toFixed(2)}deg)`;
+        for (const { el, z } of layers) el.style.transform = `translateZ(${z}px) translate(${(px * z * -0.3).toFixed(1)}px, ${(py * z * -0.2).toFixed(1)}px)`;
       }
     }
     requestAnimationFrame(frame);
