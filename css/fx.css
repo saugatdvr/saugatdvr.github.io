@@ -179,3 +179,13 @@ body.is-loaded .hero__path path { stroke-dashoffset: 0; }
 .flow .slide { transition: none; height: 86%; box-shadow: 0 40px 80px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.1); }
 .flow .slide.is-center { box-shadow: 0 50px 100px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.22); }
 .flow .slide::after { transition: opacity 0.4s; }
+
+/* ───────── 3D timeline, pinned while the playhead plays ───────── */
+.edit--pinned { height: 290vh; padding: 0; overflow: clip; }
+.edit--pinned .edit__pin { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 70px var(--pad) 30px; }
+.edit--pinned .edit__grid { margin-top: clamp(20px, 3vh, 40px); width: 100%; }
+.edit--pinned .tl { min-height: min(66vh, 46vw); }
+@media (max-width: 1000px) {
+  .edit--pinned { height: 260vh; }
+  .edit--pinned .tl { min-height: 56vh; }
+}

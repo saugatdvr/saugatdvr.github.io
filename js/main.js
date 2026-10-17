@@ -240,8 +240,9 @@
       const d = wrapD(i - pos, n), a = Math.abs(d), sg = Math.sign(d);
       const x = sg * (a * unit * 0.56 - a * a * unit * 0.035);
       const y = a * a * unit * 0.05;
-      const sc = 1 - Math.min(a, 3.6) * 0.075;
-      s.node.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) rotate(${(d * 6.5).toFixed(2)}deg) scale(${sc.toFixed(3)})`;
+      const lift = deckHover && a < 0.5 ? 1 - a * 2 : 0;
+      const sc = 1 - Math.min(a, 3.6) * 0.075 + lift * 0.04;
+      s.node.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(1)}px, ${(y - lift * 14).toFixed(1)}px, 0) rotate(${(d * 6.5).toFixed(2)}deg) scale(${sc.toFixed(3)})`;
       s.node.style.zIndex = String(Math.round(100 - a * 10));
       s.node.style.opacity = clamp(3.9 - a).toFixed(2);
       s.node.style.visibility = a > 4 ? "hidden" : "";
@@ -254,7 +255,18 @@
   setInterval(() => {
     if (flowVisible && !deckHover && !document.hidden && lb.hidden && performance.now() - lastTouch > 4500) { active += 1; layoutFlow(); }
   }, 2600);
-  flow.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") deckHover = true; });
+  // hover scrubbing: with the mouse over the fan, moving left/right shuffles the cards (no click needed)
+  let hoverBase = 0, enterX = 0;
+  flow.addEventListener("pointerenter", (e) => {
+    if (e.pointerType !== "mouse") return;
+    deckHover = true; hoverBase = active; enterX = e.clientX;
+  });
+  flow.addEventListener("pointermove", (e) => {
+    if (!deckHover || dragX != null) return;
+    const unit = (flow.offsetHeight * 0.86 * 9) / 16;
+    const next = hoverBase + Math.round((e.clientX - enterX) / (unit * 0.42));
+    if (next !== active) { active = next; lastTouch = performance.now(); layoutFlow(); }
+  });
   flow.addEventListener("pointerleave", () => (deckHover = false));
   $(".flow__arrow--prev")?.addEventListener("click", () => go(-1));
   $(".flow__arrow--next")?.addEventListener("click", () => go(1));
@@ -285,17 +297,73 @@
   if (phoneWork?.type === "video") { phoneVideo.dataset.src = phoneWork.loop || phoneWork.src; phoneVideo.poster = phoneWork.poster || ""; phoneVideo.muted = true; }
   else $(".phone").style.display = "none";
 
+  /* ── 3D editing timeline ── */
+  const tl = $(".tl"), rig = $(".tl__rig"), tracksEl = $(".tl__tracks"), playhead = $(".tl__playhead");
+  const monImg = $(".tl__screen img"), monCap = $(".tl__caption"), monTc = $(".tl__tc");
+  const posters = WORKS.filter((w) => w.poster).map((w) => w.poster);
+  const pick = (i) => posters.length ? posters[i % posters.length] : "";
+  const TRACKS = [
+    { name: "V3 TITLE", type: "title", clips: [[2, 16, "HOOK", "Stop <em>scrolling.</em>"], [30, 20, "CAPTION", "Every cut <em>on beat</em>"], [62, 14, "STAT", "<em>3×</em> watch time"], [82, 16, "CTA", "Link in <em>bio</em>"]] },
+    { name: "V2 MOTION", type: "fx", clips: [[8, 22, "Kinetic type"], [44, 18, "UI cards"], [70, 26, "Logo reveal"]] },
+    { name: "V1 VIDEO", type: "video", clips: [[0, 26, "A-roll"], [26, 18, "B-roll"], [44, 24, "Product"], [68, 32, "Talking head"]] },
+    { name: "A1 VOICE", type: "audio", clips: [[0, 58], [60, 40]] },
+    { name: "A2 MUSIC", type: "music", clips: [[0, 100]] },
+  ];
+  const wave = (n, seed) => Array.from({ length: n }, (_, i) => `<b style="--a:${(0.25 + 0.75 * Math.abs(Math.sin(i * 0.9 + seed) * Math.cos(i * 0.31 + seed * 2))).toFixed(2)}"></b>`).join("");
+  const ruler = $(".tl__ruler");
+  ruler.innerHTML = [0, 5, 10, 15, 20, 25, 30].map((t) => `<span style="left:${(t / 30) * 100}%">00:${String(t).padStart(2, "0")}</span>`).join("");
+  const liveClips = [];
+  TRACKS.forEach((t, ti) => {
+    const row = el("div", "tl__track", `<span class="tl__name">${t.name}</span>`);
+    const lane = el("div", "tl__lane");
+    t.clips.forEach(([start, len, label, caption], ci) => {
+      const c = el("div", `clip clip--${t.type === "music" ? "audio clip--music" : t.type}`);
+      c.style.left = start + "%"; c.style.width = `calc(${len}% - 3px)`;
+      if (t.type === "title") c.textContent = label;
+      else if (t.type === "fx") c.innerHTML = `<i></i>${esc(label)}<i></i>`;
+      else if (t.type === "video") { c.innerHTML = `<span>${esc(label)}</span>`; const img = pick(ci); if (img) c.style.backgroundImage = `url("${img}")`; }
+      else c.innerHTML = wave(Math.round(len * 1.1), ti * 3 + ci);
+      lane.append(c);
+      liveClips.push({ node: c, start, end: start + len, type: t.type, caption, poster: t.type === "video" ? pick(ci) : null });
+    });
+    row.append(lane); tracksEl.append(row);
+  });
+  let tlP = 0, tlHover = null, lastPoster = "", lastCap = "", tlLaneW = 0;
+  const measureLane = () => (tlLaneW = tracksEl.querySelector(".tl__lane").offsetWidth);
+  function setPlayhead(p) {
+    tlP = clamp(p);
+    playhead.style.transform = `translateX(${tlP * (tlLaneW || measureLane())}px)`;
+    const pct = tlP * 100;
+    let cap = "", poster = "";
+    liveClips.forEach((c) => {
+      const live = pct >= c.start && pct < c.end;
+      c.node.classList.toggle("is-live", live);
+      if (live && c.type === "title") cap = c.caption;
+      if (live && c.type === "video") poster = c.poster;
+    });
+    if (poster && poster !== lastPoster) { monImg.src = poster; lastPoster = poster; }
+    if (cap !== lastCap) {
+      monCap.classList.add("is-off");
+      setTimeout(() => { monCap.innerHTML = cap; monCap.classList.toggle("is-off", !cap); }, 120);
+      lastCap = cap;
+    }
+    const frames = Math.round(tlP * 30 * 25);
+    monTc.textContent = `00:00:${String(Math.floor(frames / 25)).padStart(2, "0")}:${String(frames % 25).padStart(2, "0")}`;
+  }
+  liveClips.forEach((c) => c.node.addEventListener("click", () => setPlayhead((c.start + 0.5) / 100)));
+  setPlayhead(0.1);
+
   /* ── Play/pause videos by visibility ── */
   const inView = new Map();
   const vis = new IntersectionObserver((entries) => entries.forEach((en) => {
     const t = en.target;
     inView.set(t, en.isIntersecting);
     if (t === flow) { flowVisible = en.isIntersecting; layoutFlow(false); return; }
-    if (t === curve || t === scrub || (t.dataset.fx && t !== bento)) return;
+    if (t === tl || t === curve || t === scrub || (t.dataset.fx && t !== bento)) return;
     $$("video", t).forEach((v) => (en.isIntersecting ? play(v) : v.pause()));
   }), { rootMargin: "100px" });
   const fxEls = $$("[data-fx]");
-  [$(".hero__stage"), $(".cta__visual"), flow, curve, scrub, bento, ...fxEls].forEach((n) => n && vis.observe(n));
+  [$(".hero__stage"), $(".cta__visual"), flow, tl, curve, scrub, bento, ...fxEls].forEach((n) => n && vis.observe(n));
   document.addEventListener("visibilitychange", () => $$("video").forEach((v) => {
     if (document.hidden) v.pause(); else if (v.closest(".lightbox") || inView.get(v.closest(".hero__stage, .cta__visual, .bento")) || v.closest(".slide.is-center")) play(v);
   }));
@@ -344,6 +412,7 @@
   let fanW = 200, curveW = 1000, desktop = innerWidth > 1000;
   const measure = () => {
     fanW = fanCards[0]?.node.offsetWidth || 200; curveW = curve.offsetWidth; desktop = innerWidth > 1000;
+    measureLane();
     if (!desktop) { heroInner.style.transform = ""; heroInner.style.opacity = ""; }
   };
   measure();
@@ -419,6 +488,16 @@
       }
     }
 
+    // 3D timeline: the section is pinned; the playhead travels left → right with the scroll, then the page moves on
+    if (inView.get(tl)) {
+      const sec = tl.closest(".edit"), r = sec.getBoundingClientRect();
+      tlTarget = clamp(-r.top / Math.max(1, r.height - vh) * 1.08);
+      const p = lerp(tlP, tlTarget, 0.14);
+      if (Math.abs(p - tlP) > 0.0005) setPlayhead(p);
+      const rx = (desktop ? 50 : 46) - pny * 6, rz = 9 + pnx * 5;
+      rig.style.transform = `translate(-50%, -36%) rotateX(${rx}deg) rotateZ(${rz}deg)`;
+    }
+
     // scrubbed about paragraph
     if (inView.get(scrub)) {
       const r = scrub.getBoundingClientRect();
@@ -437,5 +516,5 @@
   requestAnimationFrame(frame);
 
   let rt;
-  addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { buildTiles(); layoutFlow(false); measure(); }, 150); });
+  addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { buildTiles(); layoutFlow(false); measure(); setPlayhead(tlP); }, 150); });
 })();
