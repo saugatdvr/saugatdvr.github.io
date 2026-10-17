@@ -38,24 +38,20 @@ The first 5 videos appear in the big 3D card fan at the top.
 
 ## 4. Put it online for free (GitHub Pages)
 
-You only do this setup once.
+Your site lives at **https://saugatdvr.github.io** (repository `saugatdvr/saugatdvr.github.io`).
+The `upload to github` folder is already set up as a Git repository linked to it.
 
-1. Make a free account at **github.com**.
-2. Click the **+** (top right) → **New repository**.
-   - Name it exactly: `yourusername.github.io` (use your real GitHub username).
-   - Keep it **Public** and click **Create repository**.
-3. On the next page click **"uploading an existing file"**.
-4. Open the **`upload to github`** folder (inside `website`), press **Cmd + A** to select everything, and drag it into the browser window.
-   (This folder has everything the site needs and leaves out your huge originals in `best work`.)
-5. Wait for the upload to finish, then click **Commit changes**.
-6. Go to **Settings → Pages**. Under *Branch*, choose **main** and **/(root)**, then **Save**.
-7. Wait 1–2 minutes and open **https://yourusername.github.io**. Your site is live 🎉
+**First time**
+1. Install **GitHub Desktop** from desktop.github.com and sign in with your GitHub account.
+2. **File → Add Local Repository…** → choose `Documents/website/upload to github` → **Add Repository**.
+3. Click **Publish branch** (or **Push origin**) at the top.
+4. On github.com: repository **Settings → Pages** → Branch **main**, **/(root)** → **Save**.
 
-### Updating the live site later
-Make your changes on your Mac → double-click **Update my work.command** (it refreshes the `upload to github` folder) → go to your repository on github.com → **Add file → Upload files** → drag in everything from `upload to github` → **Commit changes**. It updates in about a minute.
-
-> If you don't see your change, do a hard refresh (Cmd + Shift + R).
-> Each video copy is kept under 25 MB so the browser upload always works.
+**Every update after that**
+1. Change text in `content.js` and/or add videos to `best work`.
+2. Double-click **Update my work.command** (it refreshes the `upload to github` folder).
+3. In GitHub Desktop, type a short note (e.g. "new reels") → **Commit to main** → **Push origin**.
+4. The live site updates in about a minute. Hard refresh with Cmd + Shift + R if needed.
 
 ---
 
