@@ -56,6 +56,16 @@ window.SITE = {
     ],
   },
 
+  // "How I edit" timeline: one step per stretch of scrolling. tool = blade, select, fusion, color, audio, render
+  editSteps: [
+    { word: "Hook", rest: "them in a second.", tool: "select", text: "The first frame decides everything: a bold line, a pattern break, a reason to stay." },
+    { word: "Cut", rest: "the dead air.", tool: "blade", text: "Every pause and retake goes, so the reel never drags." },
+    { word: "Motion", rest: "that explains.", tool: "fusion", text: "Kinetic type, UI cards and graphics built in After Effects and Fusion." },
+    { word: "Colour", rest: "that feels premium.", tool: "color", text: "Graded in DaVinci Resolve so every shot matches your brand." },
+    { word: "Sound", rest: "you can feel.", tool: "audio", text: "Music cut on the beat, clean voice and subtle sound design." },
+    { word: "Deliver", rest: "ready to post.", tool: "render", text: "Exported for Reels, TikTok and YouTube, on time, every time." },
+  ],
+
   // Big statement near the end — words light up as you scroll. Put *stars* around words to make them lime + italic.
   manifesto: "Cutting stories, chasing *retention*, turning raw footage into *reels* people actually finish. *Four years*, 500+ reels, one obsession: the *perfect cut.*",
 

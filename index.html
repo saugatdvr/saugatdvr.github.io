@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Mrs+Saint+Delafield&family=Inter:wght@400;500&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=24">
-  <link rel="stylesheet" href="css/fx.css?v=24">
+  <link rel="stylesheet" href="css/style.css?v=27">
+  <link rel="stylesheet" href="css/fx.css?v=27">
 </head>
 <body class="is-loading">
 
@@ -104,24 +104,32 @@
       <div class="bento" data-fx="tilt"></div>
     </section>
 
-    <!-- INTERACTIVE 3D TIMELINE -->
-    <section class="edit" id="process">
-      <h2 class="rule-title" data-fx="split"><span class="script">Inside</span><span>the timeline</span></h2>
-      <p class="edit__hint" data-reveal>Scroll or hover to scrub the playhead · click any clip to jump to it</p>
-      <div class="edit__grid">
-        <div class="tl" data-fx="push" aria-label="Interactive 3D editing timeline">
-          <div class="tl__stage">
-            <div class="tl__rig">
-              <div class="tl__ruler"></div>
-              <div class="tl__tracks"></div>
-              <div class="tl__playhead"><span class="tl__blade"></span></div>
-            </div>
+    <!-- DAVINCI-STYLE TIMELINE: pinned, the playhead moves as you scroll, then wipes into the next section -->
+    <section class="dvr" id="process" aria-label="How I edit">
+      <div class="dvr__pin">
+        <div class="dvr__top">
+          <div class="dvr__step">
+            <p class="dvr__count">How I edit · <b class="dvr__n">01</b> / <span class="dvr__total">06</span></p>
+            <h2 class="dvr__title"><em class="script dvr__t1"></em> <span class="dvr__t2"></span></h2>
+            <p class="dvr__text"></p>
+            <div class="dvr__dots"></div>
           </div>
-          <div class="tl__monitor" aria-hidden="true">
-            <div class="tl__screen"><img alt=""><span class="tl__caption"></span></div>
-            <div class="tl__bar"><span class="tl__rec"></span><span class="tl__tc">00:00:00:00</span></div>
+          <div class="dvr__side" aria-hidden="true">
+            <div class="dvr__tools"></div>
+            <p class="dvr__tc"><small>Timeline · 1080×1920 · 25 fps</small><span>01:00:00:00</span></p>
           </div>
         </div>
+        <div class="dvr__stage" aria-hidden="true">
+          <div class="dvr__rig">
+            <div class="dvr__panel">
+              <div class="dvr__ruler"></div>
+              <div class="dvr__tracks"></div>
+            </div>
+            <div class="dvr__ph"></div>
+          </div>
+        </div>
+        <p class="dvr__hint" aria-hidden="true">Scroll to play the edit ↓</p>
+        <div class="dvr__wipe" aria-hidden="true"></div>
       </div>
     </section>
 
@@ -224,9 +232,10 @@
 
   <div class="cursor" aria-hidden="true"><span class="cursor__label">Play</span></div>
 
-  <script src="content.js?v=24"></script>
-  <script src="works.js?v=24"></script>
-  <script src="js/main.js?v=24"></script>
-  <script src="js/fx.js?v=24"></script>
+  <script src="content.js?v=27"></script>
+  <script src="works.js?v=27"></script>
+  <script src="js/main.js?v=27"></script>
+  <script src="js/fx.js?v=27"></script>
+  <script src="js/timeline.js?v=27"></script>
 </body>
 </html>
