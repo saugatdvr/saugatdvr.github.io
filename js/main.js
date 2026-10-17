@@ -232,7 +232,10 @@
     const text = $(".flow__text");
     $(".flow__client").textContent = w.client || (w.type === "video" ? (isVertical(w) ? "Short-form reel" : "Brand film") : "Design");
     $(".flow__title").textContent = w.title || "";
-    if (swap) { text.classList.remove("swap"); void text.offsetWidth; text.classList.add("swap"); }
+    if (swap) {
+      text.classList.remove("swap"); void text.offsetWidth; text.classList.add("swap");
+      document.dispatchEvent(new CustomEvent("flowchange", { detail: slides[active].node }));
+    }
   }
   let flowVisible = false;
   const go = (step) => { if (!slides.length) return; active = (active + step + slides.length) % slides.length; layoutFlow(); };

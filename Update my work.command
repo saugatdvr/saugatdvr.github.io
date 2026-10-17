@@ -5,7 +5,7 @@ echo "Updating your work…"
 echo
 /usr/bin/env python3 tools/build_work.py
 # refresh the folder you drag into GitHub (everything except your big originals)
-rsync -a --delete --exclude "best work" --exclude "upload to github" --exclude "concepts" --exclude ".*" --exclude "__pycache__" ./ "upload to github/"
+rsync -a --delete --exclude "best work" --exclude "upload to github" --exclude "concepts" --exclude "backups" --exclude ".*" --exclude "__pycache__" ./ "upload to github/"
 echo
 echo 'The "upload to github" folder is ready: open it, select all (Cmd+A) and drag into GitHub.'
 echo

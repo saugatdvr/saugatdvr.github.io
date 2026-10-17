@@ -10,7 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=15">
+  <link rel="stylesheet" href="css/style.css?v=18">
+  <link rel="stylesheet" href="css/fx.css?v=18">
 </head>
 <body class="is-loading">
 
@@ -65,9 +66,20 @@
           <p class="hero__role"><span data-site="role"></span> · <span data-site="location"></span></p>
         </div>
         <div class="hero__stage" aria-hidden="true">
+          <svg class="tools-path" viewBox="0 0 700 700" preserveAspectRatio="none"><path d="M-40 640 C 80 520, 170 700, 300 560 S 560 430, 740 520"/></svg>
           <div class="fan"></div>
-          <span class="orb orb--a"></span>
-          <span class="orb orb--b"></span>
+          <div class="tool tool--blade" data-depth="1.4"><svg viewBox="-8 -8 140 90" data-tool="blade"></svg><span class="tool__chip">Blade<kbd>B</kbd></span></div>
+          <div class="tool tool--arrow" data-depth="1"><svg viewBox="-6 -6 70 92" data-tool="arrow"></svg><span class="tool__chip">Selection<kbd>V</kbd></span></div>
+          <div class="tool tool--pen" data-depth="0.7"><svg viewBox="-8 -8 80 120" data-tool="pen"></svg><span class="tool__chip">Pen<kbd>G</kbd></span></div>
+          <div class="tool tool--kf tool--kf1" data-depth="1.8"><svg viewBox="-6 -6 52 58" data-tool="diamond" data-color="#c8f28c"></svg></div>
+          <div class="tool tool--kf tool--kf2" data-depth="0.5"><svg viewBox="-6 -6 52 58" data-tool="diamond" data-color="#6d8bff"></svg></div>
+          <div class="tool tool--kf tool--kf3" data-depth="1.2"><svg viewBox="-6 -6 52 58" data-tool="diamond" data-color="#ffffff"></svg></div>
+        </div>
+        <div class="render-card" data-render>
+          <div class="render-card__row"><span>Render Queue <small>· Deliver</small></span><button class="render-btn" type="button">▶ Render</button></div>
+          <div class="render-bar"><i></i></div>
+          <div class="render-meta"><span data-render-file>eSewa_motion.mp4 · H.264</span><span data-render-pct>0%</span></div>
+          <div class="render-meta"><span data-render-tc>Ready · 00:00:28:00</span><span data-render-eta></span></div>
         </div>
         <a class="hero__scroll" href="#skills" aria-label="Scroll down"><svg viewBox="0 0 24 24"><path d="M6 6l6 6 6-6M6 12l6 6 6-6"/></svg></a>
       </div>
@@ -98,6 +110,40 @@
       <div class="bento" data-fx="tilt"></div>
     </section>
 
+    <!-- POP-OUT MASK / PARALLAX -->
+    <section class="popout" id="popout">
+      <div class="popout__copy">
+        <p class="pill-tag" data-reveal><span class="dot"></span>Roto + track matte</p>
+        <h2 class="popout__title" data-fx="split"><span>Break the</span> <em class="accent">frame.</em></h2>
+        <p class="popout__text" data-reveal>Subjects step out of their videos while the background, type and shapes drift at different depths as you scroll. It's the depth trick I build in After Effects, running live on the page.</p>
+        <div class="ae-layers" data-reveal>
+          <div class="ae-layers__head"><span>Composition · Yolo_popout</span><small>3 layers</small></div>
+          <div class="ae-layer is-sel"><span class="n">1</span><span class="c" style="background:#c8f28c"></span><span class="eye"></span><span>Subject <small>· Roto Brush</small></span><span class="z" data-z="0">Z +0</span></div>
+          <div class="ae-layer"><span class="n">2</span><span class="c" style="background:#fff"></span><span class="eye"></span><span>"OUT OF FRAME" <small>· Text</small></span><span class="z z--b" data-z="1">Z −60</span></div>
+          <div class="ae-layer"><span class="n">3</span><span class="c" style="background:#4a6dff"></span><span class="eye"></span><span>Plate <small>· Alpha matte</small></span><span class="z z--b" data-z="2">Z −160</span></div>
+        </div>
+      </div>
+      <div class="popout__scene" aria-hidden="true">
+        <div class="popout__rig">
+          <div class="popout__back" data-depth="-160"></div>
+          <div class="popout__word" data-depth="-60">OUT OF</div>
+          <div class="popout__stage" data-depth="0">
+            <img class="popout__plate" src="assets/img/popout-plate.jpg" alt="" loading="lazy">
+            <div class="popout__frame"></div>
+            <div class="popout__sandwich"><em>frame</em></div>
+            <img class="popout__subject" src="assets/img/popout-subject.png" alt="" loading="lazy">
+            <span class="popout__handle" style="left:46%;top:18.5%"></span>
+            <span class="popout__handle is-round" style="left:62%;top:22%"></span>
+            <span class="popout__handle is-round" style="left:31%;top:24%"></span>
+          </div>
+        </div>
+        <span class="popout__hud" style="right:4%;top:14%">Roto Brush <b>· Subject</b></span>
+        <span class="popout__hud" style="left:2%;bottom:20%">Parallax <b>· 3 depths</b></span>
+        <span class="orb popout__orb1"></span>
+        <span class="orb popout__orb2"></span>
+      </div>
+    </section>
+
     <!-- INTERACTIVE 3D TIMELINE -->
     <section class="edit" id="process">
       <h2 class="rule-title" data-fx="split"><span class="script">Inside</span><span>the timeline</span></h2>
@@ -114,6 +160,48 @@
           <div class="tl__monitor" aria-hidden="true">
             <div class="tl__screen"><img alt=""><span class="tl__caption"></span></div>
             <div class="tl__bar"><span class="tl__rec"></span><span class="tl__tc">00:00:00:00</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DAVINCI-STYLE COLOUR PAGE -->
+    <section class="grade" id="grade">
+      <div class="grade__head">
+        <h2 class="grade__title" data-fx="split"><span>Grade it</span> <em class="accent">yourself.</em></h2>
+        <p class="grade__sub" data-reveal>Drag the colour wheels and the wipe. This is the DaVinci Resolve look I give your footage, running live in the browser.</p>
+      </div>
+      <div class="grade__grid">
+        <div class="resolve" data-fx="tilt">
+          <div class="resolve__bar"><span class="resolve__dots"><i></i><i></i><i></i></span><span class="resolve__name">Insta_v2 · Timeline 1</span>
+            <span class="resolve__pages"><span>Media</span><span>Cut</span><span>Edit</span><span>Fusion</span><span class="is-on">Color</span><span>Fairlight</span><span>Deliver</span></span></div>
+          <div class="resolve__viewer">
+            <img class="resolve__before" src="assets/img/grade-car.jpg" alt="Ungraded log frame of a car" loading="lazy">
+            <div class="resolve__after">
+              <img src="assets/img/grade-car.jpg" alt="" loading="lazy">
+              <i class="tint tint--lift"></i><i class="tint tint--gamma"></i><i class="tint tint--gain"></i><i class="tint tint--offset"></i><i class="tint tint--vig"></i>
+            </div>
+            <div class="resolve__wipe" role="slider" aria-label="Before and after wipe" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="46"><span></span></div>
+            <span class="resolve__tag">Before · Log</span><span class="resolve__tag resolve__tag--r">After · Graded</span>
+          </div>
+          <div class="wheels"></div>
+        </div>
+        <div class="grade__side">
+          <div class="glass-panel" data-reveal>
+            <div class="glass-panel__head"><span>Node graph</span><small>3 nodes</small></div>
+            <div class="nodes">
+              <svg viewBox="0 0 330 150" preserveAspectRatio="none"><path d="M36 64 H72 M150 64 H182 M260 64 H296"/><circle cx="22" cy="64" r="6" fill="#4a6dff"/><circle cx="308" cy="64" r="6" fill="#c8f28c"/></svg>
+              <button type="button" class="node" data-node="balance" style="left:22%;top:24%">01 Balance<i></i></button>
+              <button type="button" class="node is-on" data-node="look" style="left:55%;top:24%">02 Look<i></i></button>
+              <button type="button" class="node is-on" data-node="vignette" style="left:38.5%;top:64%">03 Vignette<i></i></button>
+            </div>
+          </div>
+          <div class="glass-panel" data-render data-reveal>
+            <div class="glass-panel__head"><span>Render Queue</span><small>Deliver</small></div>
+            <div class="job"><i></i><div>Insta_v2_grade.mp4<small>H.265 · 2160×3840 · 24 fps</small></div></div>
+            <div class="render-bar"><i></i></div>
+            <div class="render-meta"><span data-render-tc>Ready · 572 frames</span><span data-render-pct>0%</span></div>
+            <button class="render-btn render-btn--wide" type="button">▶ Render All</button>
           </div>
         </div>
       </div>
@@ -139,7 +227,7 @@
     <section class="about" id="about">
       <div class="about__grid">
         <div class="about__portrait" data-reveal>
-          <div class="portrait"><span class="portrait__initial"></span><span class="orb orb--c"></span></div>
+          <div class="portrait"><span class="portrait__initial"></span><span class="orb orb--c"></span><canvas class="splat" aria-label="Portrait of Saugat drawn as 3D Gaussian splats"></canvas><span class="splat__hud">Gaussian Splat · <b data-splat-count>0</b> splats</span></div>
           <div class="about__meta">
             <p class="about__name" data-site="fullName"></p>
             <p class="muted"><span data-site="role"></span> · <span data-site="location"></span></p>
@@ -192,10 +280,11 @@
     <div class="lightbox__caption"></div>
   </div>
 
-  <div class="cursor" aria-hidden="true"><span class="cursor__label">Play</span></div>
+  <div class="cursor" aria-hidden="true"><svg class="cursor__arrow" viewBox="-4 -4 60 84" data-tool="arrow-sm"></svg><svg class="cursor__blade" viewBox="-8 -8 140 90" data-tool="blade-sm"></svg><span class="cursor__label">Play</span></div>
 
-  <script src="content.js?v=15"></script>
-  <script src="works.js?v=15"></script>
-  <script src="js/main.js?v=15"></script>
+  <script src="content.js?v=18"></script>
+  <script src="works.js?v=18"></script>
+  <script src="js/main.js?v=18"></script>
+  <script src="js/fx.js?v=18"></script>
 </body>
 </html>

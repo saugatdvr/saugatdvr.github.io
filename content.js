@@ -81,7 +81,7 @@ window.SITE = {
   tools: ["After Effects", "DaVinci Resolve", "Photoshop", "Canva"],
 
   // Brands you've worked with (scrolling strip)   ✏️ confirm these
-  clients: ["eSewa", "YOLO", "Ultima Lifestyle", "Babal Host", "Nest Nepal", "Siddhartha Capital", "Talent Sathi", "Nest SMS", "SMS Pasal"],
+  clients: ["eSewa", "YOLO", "Kings Lounge Kathmandu", "Ultima Lifestyle", "Hotel Bhadgaon", "Babal Host", "Nest Nepal", "Siddhartha Capital", "Talent Sathi", "Nest SMS", "SMS Pasal"],
 
   // Names + order for the videos in "best work".  ✏️ titles are my guesses from the thumbnails — fix them
   // The key on the left is the file name in lowercase with dashes ("Yolo v6.mp4" → "yolo-v6",

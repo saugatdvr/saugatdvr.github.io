@@ -66,4 +66,13 @@ The `upload to github` folder is already set up as a Git repository linked to it
 | `assets/work/` | Small web copies of your videos |
 | `css/style.css` | Colours, fonts, layout |
 | `js/main.js` | Animations and interactions |
+| `css/fx.css`, `js/fx.js` | Editing effects: 3D tools, render queue, pop-out, colour page, splat portrait |
+| `backups/` | Earlier versions of the site, to roll back if needed |
 | `tools/build_work.py` | The script behind "Update my work" |
+
+---
+
+## Undo the editing effects (roll back)
+
+A copy of the site from just before the effects were added is in `backups/before-effects`.
+To go back: copy `index.html`, `content.js`, `works.js` and the `css` and `js` folders from there into the `website` folder (replace when asked), then double-click **Update my work.command**.
