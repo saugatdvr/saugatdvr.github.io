@@ -167,3 +167,15 @@ body.is-loaded .hero__path path { stroke-dashoffset: 0; }
 }
 .dclip.v.is-graded i { filter: saturate(1.6) contrast(1.18) brightness(1.05); }
 .dclip.v i { transition: filter 0.6s; }
+
+/* ───────── Manifesto: lime block line reveal ───────── */
+.manifesto__text .w { opacity: 1; }
+.manifesto__text .ln { position: relative; display: block; width: fit-content; margin: 0 auto; }
+.manifesto__text .ln__in { display: inline-block; clip-path: inset(-0.2em 100% -0.2em 0); will-change: clip-path; }
+.manifesto__text .ln__block { position: absolute; left: -0.08em; right: -0.08em; top: 0.02em; bottom: -0.02em; background: var(--lime);
+  transform-origin: 100% 50%; will-change: transform; pointer-events: none; }
+
+/* ───────── Selected work: fanned deck ───────── */
+.flow .slide { transition: none; height: 86%; box-shadow: 0 40px 80px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.1); }
+.flow .slide.is-center { box-shadow: 0 50px 100px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.22); }
+.flow .slide::after { transition: opacity 0.4s; }

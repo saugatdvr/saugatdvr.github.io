@@ -16,7 +16,7 @@
 
   /* ── Manifesto: *word* = lime italic accent ── */
   const man = watch($(".manifesto")), manText = $(".manifesto__text");
-  let manWords = [];
+  let manWords = [], manLines = [], wordHTML = "";
   if (man && manText) {
     const src = SITE.manifesto || "";
     // split into words; punctuation right after an accent word sticks to it (no stray space)
@@ -34,6 +34,25 @@
     });
     manText.innerHTML = tokens.map((t) => `<span class="w${t.accent ? " w--accent" : ""}">${esc(t.w)}${t.tail ? `<span class="w__p">${esc(t.tail)}</span>` : ""}</span>`).join(" ");
     manWords = $$(".w", manText);
+    buildLines();
+    document.fonts?.ready.then(buildLines);
+    let rl; addEventListener("resize", () => { clearTimeout(rl); rl = setTimeout(buildLines, 200); });
+  }
+
+  // group the words into the lines the browser actually wrapped them onto, and give each line a lime block
+  function buildLines() {
+    if (!manText) return;
+    if (!wordHTML) wordHTML = manText.innerHTML;
+    manText.innerHTML = wordHTML;
+    const words = $$(":scope > .w", manText), rows = [];
+    let top = null;
+    words.forEach((w) => {
+      const t = Math.round(w.offsetTop);
+      if (top === null || Math.abs(t - top) > 4) { rows.push([]); top = t; }
+      rows[rows.length - 1].push(w.outerHTML);
+    });
+    manText.innerHTML = rows.map((r) => `<span class="ln"><span class="ln__in">${r.join(" ")}</span><i class="ln__block"></i></span>`).join("");
+    manLines = $$(".ln", manText).map((el) => ({ inner: $(".ln__in", el), block: $(".ln__block", el), q: -1 }));
   }
 
   /* ── Sign-off: rows, signature ── */
@@ -108,12 +127,19 @@
   function frame(now) {
     const vh = innerHeight, t = (now - t0) / 1000;
 
-    if (seen.get(man) && manWords.length) {
+    if (seen.get(man) && manLines.length) {
       const b = man.getBoundingClientRect();
       const p = clamp(-b.top / Math.max(1, b.height - vh));
-      const on = Math.round(clamp(p * 1.2) * manWords.length);
-      if (on !== lastOn) { manWords.forEach((w, i) => w.classList.toggle("on", i < on)); lastOn = on; }
-      manText.style.transform = `translateY(${((0.5 - p) * 26).toFixed(2)}vh)`;
+      const L = manLines.length;
+      manLines.forEach((ln, i) => {
+        // each line: a solid lime bar first, then the bar retracts left → right to reveal the words
+        const q = reduced ? 1 : clamp((p - (i / L) * 0.7) / 0.24);
+        if (Math.abs(q - ln.q) < 0.002) return;
+        ln.q = q;
+        ln.inner.style.clipPath = `inset(-0.2em ${((1 - q) * 100).toFixed(2)}% -0.2em 0)`;
+        ln.block.style.transform = `scaleX(${(1 - q).toFixed(4)})`;
+      });
+      manText.style.transform = `translateY(${((0.5 - p) * 22).toFixed(2)}vh)`;
     }
 
     if (seen.get(sign) && rows.length) {

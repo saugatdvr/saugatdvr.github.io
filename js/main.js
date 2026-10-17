@@ -209,36 +209,56 @@
     $(".flow").innerHTML = '<p class="work__hint">Add videos to the "best work" folder and run "Update my work" to fill this section.</p>';
     $(".flow__info").remove();
   }
+  // A fanned hand of cards (like "On Socials"): the centre card is big and in front,
+  // the others shrink, tilt outward and dip along an arc. The deck glides one card at a time on its own.
+  let pos = 0, deckHover = false, lastTouch = 0, shownIdx = -1;
+  const wrapIdx = (k) => ((k % slides.length) + slides.length) % slides.length;
+  const wrapD = (d, n) => { d = ((d % n) + n) % n; return d > n / 2 ? d - n : d; };
   function layoutFlow(swap = true) {
     const n = slides.length; if (!n) return;
-    const unit = (flow.offsetHeight * 0.92 * 9) / 16;
+    const idx = wrapIdx(active);
     slides.forEach((s, i) => {
-      let d = i - active;
-      if (d > n / 2) d -= n; if (d < -n / 2) d += n;
-      const a = Math.abs(d), sgn = Math.sign(d);
-      const x = a === 0 ? 0 : sgn * (unit * 0.78 + (a - 1) * unit * 0.5);
-      s.node.style.transform = `translate(-50%, -50%) translate3d(${x}px, 0, ${-a * 170}px) rotateY(${-sgn * Math.min(a, 1) * 36}deg)`;
-      s.node.style.opacity = a > 3 ? 0 : 1;
-      s.node.style.visibility = a > 4 ? "hidden" : "";
-      s.node.style.setProperty("--dim", a === 0 ? 0 : Math.min(0.8, 0.38 + (a - 1) * 0.2));
-      s.node.style.zIndex = 10 - a;
-      s.node.style.pointerEvents = a > 2 ? "none" : "";
-      s.node.classList.toggle("is-center", a === 0);
-      s.node.dataset.cursor = a === 0 ? "Play" : "";
-      if (s.media.tagName === "VIDEO") { if (a === 0 && flowVisible) play(s.media); else s.media.pause(); }
+      const centre = i === idx;
+      s.node.classList.toggle("is-center", centre);
+      s.node.dataset.cursor = centre ? "Play" : "";
+      if (s.media.tagName === "VIDEO") { if (centre && flowVisible) play(s.media); else s.media.pause(); }
     });
-    const w = slides[active].work;
-    $(".flow__index").textContent = String(slides[active].real + 1).padStart(2, "0");
+    if (idx === shownIdx && !swap) return;
+    shownIdx = idx;
+    const w = slides[idx].work;
+    $(".flow__index").textContent = String(slides[idx].real + 1).padStart(2, "0");
     const text = $(".flow__text");
     $(".flow__client").textContent = w.client || (w.type === "video" ? (isVertical(w) ? "Short-form reel" : "Brand film") : "Design");
     $(".flow__title").textContent = w.title || "";
     if (swap) { text.classList.remove("swap"); void text.offsetWidth; text.classList.add("swap"); }
   }
+  function renderDeck(dt) {
+    const n = slides.length; if (!n) return;
+    pos = reduced ? active : lerp(pos, active, Math.min(1, dt * 0.0055));
+    const unit = (flow.offsetHeight * 0.86 * 9) / 16;
+    slides.forEach((s, i) => {
+      const d = wrapD(i - pos, n), a = Math.abs(d), sg = Math.sign(d);
+      const x = sg * (a * unit * 0.56 - a * a * unit * 0.035);
+      const y = a * a * unit * 0.05;
+      const sc = 1 - Math.min(a, 3.6) * 0.075;
+      s.node.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) rotate(${(d * 6.5).toFixed(2)}deg) scale(${sc.toFixed(3)})`;
+      s.node.style.zIndex = String(Math.round(100 - a * 10));
+      s.node.style.opacity = clamp(3.9 - a).toFixed(2);
+      s.node.style.visibility = a > 4 ? "hidden" : "";
+      s.node.style.pointerEvents = a > 3 ? "none" : "";
+      s.node.style.setProperty("--dim", Math.min(0.45, a * 0.11).toFixed(2));
+    });
+  }
   let flowVisible = false;
-  const go = (step) => { if (!slides.length) return; active = (active + step + slides.length) % slides.length; layoutFlow(); };
+  const go = (step) => { if (!slides.length) return; active += step; lastTouch = performance.now(); layoutFlow(); };
+  setInterval(() => {
+    if (flowVisible && !deckHover && !document.hidden && lb.hidden && performance.now() - lastTouch > 4500) { active += 1; layoutFlow(); }
+  }, 2600);
+  flow.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") deckHover = true; });
+  flow.addEventListener("pointerleave", () => (deckHover = false));
   $(".flow__arrow--prev")?.addEventListener("click", () => go(-1));
   $(".flow__arrow--next")?.addEventListener("click", () => go(1));
-  $(".flow__play")?.addEventListener("click", () => openWork(slides[active]?.work));
+  $(".flow__play")?.addEventListener("click", () => openWork(slides[wrapIdx(active)]?.work));
   addEventListener("keydown", (e) => {
     if (!flowVisible || !lb.hidden) return;
     if (e.key === "ArrowRight") go(1); if (e.key === "ArrowLeft") go(-1);
@@ -254,7 +274,8 @@
   addEventListener("pointerup", () => { dragX = null; });
   slides.forEach((s, i) => s.node.addEventListener("click", () => {
     if (dragged) return;
-    if (i === active) openWork(s.work); else { active = i; layoutFlow(); }
+    const d = Math.round(wrapD(i - active, slides.length));
+    if (d === 0) openWork(s.work); else go(d);
   }));
   layoutFlow(false);
 
@@ -381,6 +402,8 @@
         node.style.opacity = intro;
       });
     }
+
+    if (flowVisible) renderDeck(dt);
 
     // curved kinetic wall
     if (inView.get(curve) && tiles.length) {
