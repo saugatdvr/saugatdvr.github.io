@@ -387,6 +387,8 @@
     inView.set(t, en.isIntersecting);
     if (t === flow) {
       if (en.isIntersecting) slides.forEach((sl) => { if (sl.media.dataset.poster) { sl.media.poster = sl.media.dataset.poster; delete sl.media.dataset.poster; } });
+      // arriving at the deck: hold the current card (the first work on first visit) before auto-advancing
+      if (en.isIntersecting && !flowVisible) lastTouch = performance.now();
       flowVisible = en.isIntersecting; flow.classList.toggle("is-on", en.isIntersecting); layoutFlow(false); return;
     }
     if (t === curve) { curve.classList.toggle("is-on", en.isIntersecting); return; }

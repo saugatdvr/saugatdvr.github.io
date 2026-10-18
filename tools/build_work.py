@@ -83,7 +83,7 @@ def best_moment(src, dur):
     return max(0.0, min(best - 1, dur - 7))
 
 
-def build_video(src, slug, start_at=None):
+def build_video(src, slug, start_at=None, note=None):
     w, h, dur = probe(src)
     full, loop, poster = OUT / f"{slug}.mp4", OUT / f"{slug}-loop.mp4", OUT / f"{slug}.jpg"
     long_side = "1280"
@@ -97,16 +97,19 @@ def build_video(src, slug, start_at=None):
             if full.stat().st_size < MAX_BYTES:
                 break
             print(f"  still {full.stat().st_size / 1e6:.0f} MB, compressing more…")
+    # editing the .txt (e.g. a new "start:") remakes the loop and poster too
+    newer_note = lambda out: note is not None and note.exists() and out.exists() and out.stat().st_mtime < note.stat().st_mtime
+    loop_stale, poster_stale = stale(loop, src) or newer_note(loop), stale(poster, src) or newer_note(poster)
     if start_at is not None:
         start = min(start_at, max(0.0, dur - 6))
     else:
-        start = best_moment(src, dur) if stale(loop, src) or stale(poster, src) else 0
-    if stale(loop, src):
+        start = best_moment(src, dur) if loop_stale or poster_stale else 0
+    if loop_stale:
         print(f"  preview loop {src.name}")
         small = scale.replace(long_side, "720")
         run(["-ss", f"{start:.2f}", "-t", "6", "-i", str(src), "-vf", small, "-an", "-c:v", "libx264",
              "-preset", "slow", "-crf", "22", "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(loop)])
-    if stale(poster, src):
+    if poster_stale:
         run(["-ss", f"{start + 0.3:.2f}", "-i", str(src), "-frames:v", "1",
              "-vf", scale.replace(long_side, "900"), "-q:v", "3", str(poster)])
     return {"type": "video", "w": w, "h": h, "duration": round(dur, 1),
@@ -146,7 +149,7 @@ def main():
         starts = [l.split(":", 1)[1] for l in lines if l.lower().startswith("start:")]
         desc = "\n".join(l for l in lines if not l.lower().startswith("start:")).strip()
         if src.suffix.lower() in VIDEO:
-            item, names = build_video(src, slug, float(starts[0]) if starts else None)
+            item, names = build_video(src, slug, float(starts[0]) if starts else None, note)
         else:
             item, names = build_image(src, slug)
         item.update({"order": order, "slug": slug, "client": client, "title": title, "description": desc})
